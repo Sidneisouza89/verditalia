@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section id="top" className="relative h-[640px] md:h-[720px] w-full overflow-hidden">
+    <section id="top" className="relative h-[480px] md:h-[560px] w-full overflow-hidden">
       <img
         src="https://images.unsplash.com/photo-1529566321973-795c4f4138bb?auto=format&fit=crop&w=1800&q=80"
         alt="Casal admirando as montanhas ao entardecer"
@@ -16,23 +16,7 @@ export default function Hero() {
           <br />
           e beleza.
         </h1>
-
-        {/* Subtítulo removido a pedido da Lídice */}
-
-        <div className="flex flex-wrap gap-4 mt-8">
-          <a
-            href="#guias"
-            className="inline-flex items-center gap-2 bg-forest-600 hover:bg-forest-500 transition-colors text-white text-sm px-6 py-3.5 rounded-md"
-          >
-            Explorar guias <span aria-hidden>→</span>
-          </a>
-          <a
-            href="#planejamento"
-            className="inline-flex items-center gap-2 border border-white/70 hover:bg-white/10 transition-colors text-white text-sm px-6 py-3.5 rounded-md"
-          >
-            Planeje sua viagem <span aria-hidden>→</span>
-          </a>
-        </div>
+        {/* Botões removidos a pedido da Lídice — banner minimalista */}
       </div>
 
       <p className="absolute bottom-5 right-6 lg:right-10 text-white/70 text-xs text-right leading-tight">

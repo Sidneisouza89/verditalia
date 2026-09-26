@@ -69,28 +69,19 @@ export default function PlanejamentoConteudo() {
             </a>
           </div>
 
-          <a
-            href="https://www.youtube.com/@verditalia"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative rounded-xl overflow-hidden h-64 md:h-80 block"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1726855500757-658894d298eb?auto=format&fit=crop&w=700&q=80"
-              alt="Lago di Braies nos Dolomitas"
-              className="w-full h-full object-cover"
+          <div className="relative rounded-xl overflow-hidden h-64 md:h-80">
+            <span className="absolute top-3 left-3 z-10 bg-forest-800/80 text-white text-[10px] px-2.5 py-1 rounded-full">
+              Um dos mais assistidos
+            </span>
+            {/* Vídeo real do canal — um dos mais curtidos, gravado numa viagem dela */}
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/Wg-2UbbbzhY"
+              title="Vídeo Verditalia"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-forest-900/90 via-forest-900/5 to-transparent" />
-            <span className="absolute top-3 left-3 bg-forest-800/80 text-white text-[10px] px-2.5 py-1 rounded-full">
-              Último vídeo
-            </span>
-            <span className="absolute inset-0 m-auto w-14 h-14 rounded-full bg-white/90 flex items-center justify-center">
-              ▶
-            </span>
-            <p className="absolute bottom-3 left-3 right-3 text-white text-sm font-medium">
-              DOLOMITAS: LAGO DI BRAIES E ARREDORES
-            </p>
-          </a>
+          </div>
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import MountainMark from './MountainMark';
 
 const NAV_LINKS = [
   { label: 'Sobre', to: '/sobre' },
@@ -38,33 +39,38 @@ export default function Header({ solid = false }) {
           : 'absolute top-0 left-0 right-0 z-30'
       }
     >
-      <div className="max-w-[1400px] mx-auto flex items-center px-6 lg:px-10 py-6">
-        <Link to="/" className="flex flex-col leading-none shrink-0">
-          <span className="font-display text-xl md:text-2xl tracking-wide text-white">
-            VERDITALIA
-          </span>
-          <span className="text-[11px] md:text-xs text-white/80 mt-1">
-            Vida com natureza e beleza.
+      <div className="max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-6">
+        <Link to="/" className="flex items-center gap-3 shrink-0">
+          <MountainMark className="h-8 w-auto text-white" />
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-xl md:text-2xl tracking-wide text-white">
+              VERDITALIA
+            </span>
+            <span className="text-[11px] md:text-xs text-white/80 mt-1">
+              Vida com natureza e beleza.
+            </span>
           </span>
         </Link>
 
-        {/* Recuado pra perto do logo (não colado), em vez de centralizado */}
-        <nav className="hidden lg:flex items-center gap-8 ml-14">
-          {NAV_LINKS.map((link) =>
-            renderLink(link, 'text-sm text-white/90 hover:text-white transition-colors')
-          )}
-        </nav>
+        {/* Nav + CTA agrupados à direita, próximos entre si */}
+        <div className="hidden lg:flex items-center gap-10">
+          <nav className="flex items-center gap-8">
+            {NAV_LINKS.map((link) =>
+              renderLink(link, 'text-sm text-white/90 hover:text-white transition-colors')
+            )}
+          </nav>
 
-        <Link
-          to="/agendar"
-          className="hidden lg:inline-flex items-center gap-2 bg-forest-700 hover:bg-forest-600 transition-colors text-white text-sm px-5 py-3 rounded-md ml-auto"
-        >
-          Comece sua viagem
-          <span aria-hidden>→</span>
-        </Link>
+          <Link
+            to="/agendar"
+            className="inline-flex items-center gap-2 bg-forest-700 hover:bg-forest-600 transition-colors text-white text-sm px-5 py-3 rounded-md"
+          >
+            Comece sua viagem
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
 
         <button
-          className="lg:hidden text-white ml-auto"
+          className="lg:hidden text-white"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Abrir menu"
         >
