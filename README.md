@@ -1,44 +1,16 @@
-# Verditalia
+# React + Vite
 
-Site institucional — Vida com natureza e beleza.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-Stack: React + Vite + Tailwind CSS.
+Currently, two official plugins are available:
 
-## Rodando localmente
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-```bash
-npm install
-npm run dev
-```
+## React Compiler
 
-## Build de produção
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-```bash
-npm run build
-npm run preview
-```
+## Expanding the Oxlint configuration
 
-## Estrutura
-
-```
-src/
-  components/   -> Header, DestinoCard (reutilizáveis)
-  sections/     -> Hero, Destinos, PlanejamentoConteudo, NossaCasa, Footer
-  App.jsx       -> composição da home
-```
-
-## Deploy no Railway
-
-1. Suba este repositório no GitHub.
-2. No Railway: New Project → Deploy from GitHub repo.
-3. Railway detecta o Vite automaticamente. Se precisar, configure:
-   - Build command: `npm run build`
-   - Start command: `npx serve dist -s -l $PORT` (ou usar um Static Site service)
-4. Adicione domínio customizado depois do primeiro deploy.
-
-## Notas
-
-- As imagens usadas neste scaffold são placeholders do Unsplash — substituir
-  pelas fotos originais da Lídice (créditos autorais) antes de publicar.
-- Paleta e tipografia (Fraunces + Work Sans) seguem o design de referência
-  enviado pela cliente. Ajustar `tailwind.config.js` caso a marca evolua.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.

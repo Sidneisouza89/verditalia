@@ -1,12 +1,12 @@
 const DIFERENCIAIS = [
   {
-    title: 'Conhecimento local',
+    title: 'Especialistas no Território',
     desc: 'Informações que só quem vive aqui conhece.',
     icon: '📍',
   },
   {
-    title: 'Experiências reais',
-    desc: 'Testamos cada roteiro, trilha e hospedagem.',
+    title: 'Experiências autênticas',
+    desc: 'Em vilarejos, produtores locais e tradições.',
     icon: '🥾',
   },
   {
@@ -45,7 +45,7 @@ export default function NossaCasa() {
             ))}
           </div>
 
-          <a href="#" className="text-sm text-forest-800 underline underline-offset-4 w-fit">
+          <a href="#sobre" className="text-sm text-forest-800 underline underline-offset-4 w-fit">
             Conhecer a região →
           </a>
         </div>
@@ -57,6 +57,7 @@ export default function NossaCasa() {
             className="absolute inset-0 w-full h-full object-cover"
           />
 
+          {/* Endereço/cidade específica removida a pedido da Lídice */}
           <div className="absolute bottom-6 right-6 bg-forest-800/95 text-white rounded-xl p-5 w-48 backdrop-blur-sm">
             <div className="text-2xl mb-2">🗺️</div>
             <p className="font-display text-sm leading-tight mb-1">

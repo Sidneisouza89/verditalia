@@ -3,7 +3,7 @@ export default function Hero() {
     <section id="top" className="relative h-[640px] md:h-[720px] w-full overflow-hidden">
       <img
         src="https://images.unsplash.com/photo-1529566321973-795c4f4138bb?auto=format&fit=crop&w=1800&q=80"
-        alt="Casal admirando as montanhas Dolomitas ao entardecer"
+        alt="Casal admirando as montanhas ao entardecer"
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-forest-900/70 via-forest-900/10 to-forest-900/50" />
@@ -16,13 +16,12 @@ export default function Hero() {
           <br />
           e beleza.
         </h1>
-        <p className="text-white/90 text-base md:text-lg mt-6 max-w-md">
-          Descubra uma Itália autêntica através de quem vive nos Alpes Italianos.
-        </p>
+
+        {/* Subtítulo removido a pedido da Lídice */}
 
         <div className="flex flex-wrap gap-4 mt-8">
           <a
-            href="#destinos"
+            href="#guias"
             className="inline-flex items-center gap-2 bg-forest-600 hover:bg-forest-500 transition-colors text-white text-sm px-6 py-3.5 rounded-md"
           >
             Explorar guias <span aria-hidden>→</span>
@@ -31,7 +30,7 @@ export default function Hero() {
             href="#planejamento"
             className="inline-flex items-center gap-2 border border-white/70 hover:bg-white/10 transition-colors text-white text-sm px-6 py-3.5 rounded-md"
           >
-            Planejar minha viagem <span aria-hidden>→</span>
+            Planeje sua viagem <span aria-hidden>→</span>
           </a>
         </div>
       </div>

@@ -3,6 +3,8 @@ import Hero from './sections/Hero';
 import Destinos from './sections/Destinos';
 import PlanejamentoConteudo from './sections/PlanejamentoConteudo';
 import NossaCasa from './sections/NossaCasa';
+import Sobre from './sections/Sobre';
+import Contato from './sections/Contato';
 import Footer from './sections/Footer';
 
 export default function App() {
@@ -13,6 +15,8 @@ export default function App() {
       <Destinos />
       <PlanejamentoConteudo />
       <NossaCasa />
+      <Sobre />
+      <Contato />
       <Footer />
     </div>
   );

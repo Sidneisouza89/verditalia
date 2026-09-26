@@ -1,11 +1,9 @@
 import { useState } from 'react';
 
 const NAV_LINKS = [
-  { label: 'Destinos', hasDropdown: true },
-  { label: 'Planejamento', hasDropdown: true },
-  { label: 'Youtube', hasDropdown: false },
-  { label: 'Sobre', hasDropdown: false },
-  { label: 'Contato', hasDropdown: false },
+  { label: 'Sobre', href: '#sobre' },
+  { label: 'YouTube', href: '#youtube' },
+  { label: 'Contato', href: '#contato' },
 ];
 
 export default function Header() {
@@ -14,7 +12,6 @@ export default function Header() {
   return (
     <header className="absolute top-0 left-0 right-0 z-30">
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-6">
-        {/* Logo */}
         <a href="#top" className="flex flex-col leading-none group">
           <span className="font-display text-xl md:text-2xl tracking-wide text-white">
             VERDITALIA
@@ -24,25 +21,18 @@ export default function Header() {
           </span>
         </a>
 
-        {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-9">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
-              href="#"
-              className="text-sm text-white/90 hover:text-white transition-colors flex items-center gap-1"
+              href={link.href}
+              className="text-sm text-white/90 hover:text-white transition-colors"
             >
               {link.label.toUpperCase()}
-              {link.hasDropdown && (
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-                  <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
             </a>
           ))}
         </nav>
 
-        {/* CTA */}
         <a
           href="#planejamento"
           className="hidden lg:inline-flex items-center gap-2 bg-forest-700 hover:bg-forest-600 transition-colors text-white text-sm px-5 py-3 rounded-md"
@@ -51,7 +41,6 @@ export default function Header() {
           <span aria-hidden>→</span>
         </a>
 
-        {/* Mobile toggle */}
         <button
           className="lg:hidden text-white"
           onClick={() => setMenuOpen((v) => !v)}
@@ -63,11 +52,10 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="lg:hidden bg-forest-900 px-6 pb-6 flex flex-col gap-4">
           {NAV_LINKS.map((link) => (
-            <a key={link.label} href="#" className="text-white/90 text-sm">
+            <a key={link.label} href={link.href} className="text-white/90 text-sm">
               {link.label.toUpperCase()}
             </a>
           ))}

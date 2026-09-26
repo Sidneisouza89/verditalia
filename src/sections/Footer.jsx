@@ -1,72 +1,21 @@
-const COLUNAS = [
-  {
-    title: 'DESTINOS',
-    links: ['Dolomitas', 'Roma', 'Umbria', 'Trentino-Alto Adige'],
-  },
-  {
-    title: 'PLANEJAMENTO',
-    links: ['Consultoria Personalizada', 'Como funciona', 'Perguntas frequentes'],
-  },
-  {
-    title: 'VERDITALIA',
-    links: ['Sobre nós', 'Nossa história', 'Contato'],
-  },
-];
-
 export default function Footer() {
   return (
-    <footer id="contato" className="bg-forest-900 text-white/85">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-16 grid lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.3fr] gap-10">
-        <div>
+    <footer className="bg-forest-900 text-white/85">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-14 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="text-center md:text-left">
           <p className="font-display text-xl text-white mb-1">VERDITALIA</p>
-          <p className="text-xs text-white/60 mb-5">Vida com natureza e beleza.</p>
-          <p className="text-sm text-white/70 flex items-start gap-1.5 mb-6">
-            📍 Rovereto, Trentino-Alto Adige
-            <br />
-            Itália
-          </p>
-          <div className="flex gap-3 text-white/70">
-            <a href="#" aria-label="Instagram">📷</a>
-            <a href="#" aria-label="YouTube">▶️</a>
-            <a href="#" aria-label="WhatsApp">💬</a>
-            <a href="#" aria-label="E-mail">✉️</a>
-          </div>
+          <p className="text-xs text-white/60">Vida com natureza e beleza.</p>
         </div>
 
-        {COLUNAS.map((col) => (
-          <div key={col.title}>
-            <p className="text-xs tracking-widest text-white/50 mb-4">{col.title}</p>
-            <ul className="space-y-2.5">
-              {col.links.map((l) => (
-                <li key={l}>
-                  <a href="#" className="text-sm hover:text-white transition-colors">
-                    {l}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <nav className="flex flex-wrap justify-center gap-6 text-sm">
+          <a href="#sobre" className="hover:text-white transition-colors">Sobre</a>
+          <a href="https://www.youtube.com/@verditalia" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">YouTube</a>
+          <a href="#contato" className="hover:text-white transition-colors">Contato</a>
+        </nav>
 
-        <div>
-          <p className="text-xs tracking-widest text-white/50 mb-4">NEWSLETTER</p>
-          <p className="text-sm mb-4">
-            Receba dicas e novidades direto no seu e-mail.
-          </p>
-          <form className="flex" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder="Seu melhor e-mail"
-              className="flex-1 bg-white text-forest-900 text-sm px-4 py-2.5 rounded-l-md outline-none"
-            />
-            <button
-              type="submit"
-              className="bg-forest-600 hover:bg-forest-500 transition-colors px-4 rounded-r-md"
-              aria-label="Inscrever"
-            >
-              →
-            </button>
-          </form>
+        <div className="flex gap-4 text-white/70 text-lg">
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="https://www.youtube.com/@verditalia" target="_blank" rel="noopener noreferrer" aria-label="YouTube">▶️</a>
         </div>
       </div>
 
