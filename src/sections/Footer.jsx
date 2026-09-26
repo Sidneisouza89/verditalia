@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Footer() {
   return (
     <footer className="bg-forest-900 text-white/85">
@@ -8,9 +10,9 @@ export default function Footer() {
         </div>
 
         <nav className="flex flex-wrap justify-center gap-6 text-sm">
-          <a href="/#sobre" className="hover:text-white transition-colors">Sobre</a>
+          <Link to="/sobre" className="hover:text-white transition-colors">Sobre</Link>
           <a href="https://www.youtube.com/@verditalia" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">YouTube</a>
-          <a href="/#contato" className="hover:text-white transition-colors">Contato</a>
+          <Link to="/contato" className="hover:text-white transition-colors">Contato</Link>
         </nav>
 
         <div className="flex gap-4 text-white/70 text-lg">

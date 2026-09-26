@@ -3,10 +3,10 @@ import Hero from '../sections/Hero';
 import Destinos from '../sections/Destinos';
 import PlanejamentoConteudo from '../sections/PlanejamentoConteudo';
 import NossaCasa from '../sections/NossaCasa';
-import Sobre from '../sections/Sobre';
-import Contato from '../sections/Contato';
 import Footer from '../sections/Footer';
 
+// Sobre e Contato viraram páginas próprias (/sobre, /contato) — não ficam
+// mais como seções de scroll aqui na home.
 export default function Home() {
   return (
     <div className="min-h-screen bg-cream-100">
@@ -15,8 +15,6 @@ export default function Home() {
       <Destinos />
       <PlanejamentoConteudo />
       <NossaCasa />
-      <Sobre />
-      <Contato />
       <Footer />
     </div>
   );

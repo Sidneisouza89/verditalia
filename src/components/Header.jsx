@@ -2,15 +2,33 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const NAV_LINKS = [
-  { label: 'Sobre', href: '/#sobre' },
-  { label: 'YouTube', href: '/#youtube' },
-  { label: 'Contato', href: '/#contato' },
+  { label: 'Sobre', to: '/sobre' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@verditalia', external: true },
+  { label: 'Contato', to: '/contato' },
 ];
 
-// solid=true -> usado em páginas sem imagem de fundo (ex: /agendar),
-// onde o header precisa de cor própria em vez de ficar transparente sobre o hero.
+// solid=true -> usado em páginas sem imagem de fundo (ex: /agendar, /sobre,
+// /contato), onde o header precisa de cor própria em vez de ficar
+// transparente sobre o hero.
 export default function Header({ solid = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const renderLink = (link, className) =>
+    link.external ? (
+      <a
+        key={link.label}
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
+        {link.label.toUpperCase()}
+      </a>
+    ) : (
+      <Link key={link.label} to={link.to} className={className}>
+        {link.label.toUpperCase()}
+      </Link>
+    );
 
   return (
     <header
@@ -32,15 +50,9 @@ export default function Header({ solid = false }) {
 
         {/* Recuado pra perto do logo (não colado), em vez de centralizado */}
         <nav className="hidden lg:flex items-center gap-8 ml-14">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-sm text-white/90 hover:text-white transition-colors"
-            >
-              {link.label.toUpperCase()}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) =>
+            renderLink(link, 'text-sm text-white/90 hover:text-white transition-colors')
+          )}
         </nav>
 
         <Link
@@ -64,11 +76,7 @@ export default function Header({ solid = false }) {
 
       {menuOpen && (
         <div className="lg:hidden bg-forest-900 px-6 pb-6 flex flex-col gap-4">
-          {NAV_LINKS.map((link) => (
-            <a key={link.label} href={link.href} className="text-white/90 text-sm">
-              {link.label.toUpperCase()}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) => renderLink(link, 'text-white/90 text-sm'))}
           <Link
             to="/agendar"
             className="inline-flex items-center gap-2 bg-forest-600 text-white text-sm px-5 py-3 rounded-md w-fit"
