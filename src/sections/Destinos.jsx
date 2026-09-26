@@ -43,8 +43,8 @@ const DESTINOS = [
 
 export default function Destinos() {
   return (
-    <section id="guias" className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-10 pb-20 md:pt-14 md:pb-28">
-      <div className="text-center mb-14">
+    <section id="guias" className="max-w-[1400px] mx-auto px-6 lg:px-10 py-10 md:py-14">
+      <div className="text-center mb-10">
         <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
           NOSSOS GUIAS AUTORAIS
         </p>

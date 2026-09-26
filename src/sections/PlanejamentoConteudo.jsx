@@ -7,12 +7,19 @@ const BENEFICIOS = [
   'Experiências e lugares selecionados',
 ];
 
+// Vinheta radial: dissolve as bordas da imagem revelando o fundo por trás,
+// em vez de terminar numa borda reta. Usada nas fotos de destaque desta seção.
+const fadeEdges = {
+  WebkitMaskImage: 'radial-gradient(ellipse at center, black 62%, transparent 100%)',
+  maskImage: 'radial-gradient(ellipse at center, black 62%, transparent 100%)',
+};
+
 export default function PlanejamentoConteudo() {
   return (
     <section id="planejamento" className="bg-cream-200">
       <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2">
         {/* Planejamento / Consultoria */}
-        <div className="grid md:grid-cols-2 items-center gap-8 px-6 lg:px-10 py-16 md:py-20 border-b lg:border-b-0 lg:border-r border-forest-900/10">
+        <div className="grid md:grid-cols-2 items-center gap-8 px-6 lg:px-10 py-10 md:py-14 border-b lg:border-b-0 lg:border-r border-forest-900/10">
           <div>
             <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
               PLANEJAMENTO PERSONALIZADO
@@ -43,12 +50,13 @@ export default function PlanejamentoConteudo() {
           <img
             src="https://images.unsplash.com/photo-1499591934245-40b55745b905?auto=format&fit=crop&w=700&q=80"
             alt="Mesa de planejamento de viagem com mapa e caneca Verditalia"
-            className="rounded-xl h-64 md:h-80 w-full object-cover"
+            className="h-64 md:h-80 w-full object-cover"
+            style={fadeEdges}
           />
         </div>
 
         {/* YouTube */}
-        <div id="youtube" className="grid md:grid-cols-2 items-center gap-8 px-6 lg:px-10 py-16 md:py-20">
+        <div id="youtube" className="grid md:grid-cols-2 items-center gap-8 px-6 lg:px-10 py-10 md:py-14">
           <div>
             <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
               CONTEÚDO EM CAMPO
@@ -80,18 +88,21 @@ export default function PlanejamentoConteudo() {
             href="https://youtu.be/Wg-2UbbbzhY"
             target="_blank"
             rel="noopener noreferrer"
-            className="relative rounded-xl overflow-hidden h-64 md:h-80 block group"
+            className="relative h-64 md:h-80 block group"
           >
-            <img
-              src="https://img.youtube.com/vi/Wg-2UbbbzhY/maxresdefault.jpg"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = 'https://img.youtube.com/vi/Wg-2UbbbzhY/hqdefault.jpg';
-              }}
-              alt="Último vídeo do canal Verditalia"
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-forest-900/85 via-forest-900/10 to-transparent" />
+            {/* mask aplicada no wrapper (foto + overlay escuro juntos) */}
+            <div className="absolute inset-0" style={fadeEdges}>
+              <img
+                src="https://img.youtube.com/vi/Wg-2UbbbzhY/maxresdefault.jpg"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = 'https://img.youtube.com/vi/Wg-2UbbbzhY/hqdefault.jpg';
+                }}
+                alt="Último vídeo do canal Verditalia"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-forest-900/85 via-forest-900/10 to-transparent" />
+            </div>
             <span className="absolute top-3 left-3 bg-forest-800/80 text-white text-[10px] px-2.5 py-1 rounded-full">
               Último vídeo
             </span>
