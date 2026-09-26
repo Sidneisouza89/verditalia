@@ -42,13 +42,9 @@ export default function Header({ solid = false }) {
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-6">
         <Link to="/" className="flex items-center gap-3 shrink-0">
           <MountainMark className="h-8 w-auto text-white" />
-          <span className="flex flex-col leading-none">
-            <span className="font-display text-xl md:text-2xl tracking-wide text-white">
-              VERDITALIA
-            </span>
-            <span className="text-[11px] md:text-xs text-white/80 mt-1">
-              Vida com natureza e beleza.
-            </span>
+          {/* Tagline removida do header — já aparece grande no Hero, ficava redundante */}
+          <span className="font-display text-xl md:text-2xl tracking-wide text-white">
+            VERDITALIA
           </span>
         </Link>
 

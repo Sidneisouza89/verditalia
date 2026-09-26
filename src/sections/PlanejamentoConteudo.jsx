@@ -69,19 +69,36 @@ export default function PlanejamentoConteudo() {
             </a>
           </div>
 
-          <div className="relative rounded-xl overflow-hidden h-64 md:h-80">
-            <span className="absolute top-3 left-3 z-10 bg-forest-800/80 text-white text-[10px] px-2.5 py-1 rounded-full">
-              Um dos mais assistidos
-            </span>
-            {/* Vídeo real do canal — um dos mais curtidos, gravado numa viagem dela */}
-            <iframe
-              className="w-full h-full"
-              src="https://www.youtube.com/embed/Wg-2UbbbzhY"
-              title="Vídeo Verditalia"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
+          {/*
+            Em vez de embutir o player do YouTube (alguns vídeos vêm com
+            "incorporação desativada" pelo dono e quebram o iframe), usamos a
+            thumbnail oficial do vídeo como capa clicável -> abre no YouTube
+            em nova aba. Também prepara terreno pro CMS: no futuro ela troca
+            o ID do vídeo (e pode subir uma capa própria) sem depender de código.
+          */}
+          <a
+            href="https://youtu.be/Wg-2UbbbzhY"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative rounded-xl overflow-hidden h-64 md:h-80 block group"
+          >
+            <img
+              src="https://img.youtube.com/vi/Wg-2UbbbzhY/maxresdefault.jpg"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = 'https://img.youtube.com/vi/Wg-2UbbbzhY/hqdefault.jpg';
+              }}
+              alt="Último vídeo do canal Verditalia"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
-          </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-forest-900/85 via-forest-900/10 to-transparent" />
+            <span className="absolute top-3 left-3 bg-forest-800/80 text-white text-[10px] px-2.5 py-1 rounded-full">
+              Último vídeo
+            </span>
+            <span className="absolute inset-0 m-auto w-14 h-14 rounded-full bg-white/90 flex items-center justify-center text-lg">
+              ▶
+            </span>
+          </a>
         </div>
       </div>
     </section>

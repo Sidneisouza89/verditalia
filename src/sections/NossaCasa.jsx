@@ -1,19 +1,9 @@
+import { Link } from 'react-router-dom';
+
 const DIFERENCIAIS = [
-  {
-    title: 'Especialistas no Território',
-    desc: 'Informações que só quem vive aqui conhece.',
-    icon: '📍',
-  },
-  {
-    title: 'Experiências autênticas',
-    desc: 'Em vilarejos, produtores locais e tradições.',
-    icon: '🥾',
-  },
-  {
-    title: 'Conteúdo confiável',
-    desc: 'Dicas práticas, honestas e sempre atualizadas.',
-    icon: '💬',
-  },
+  { title: 'Especialistas no território', icon: '📍' },
+  { title: 'Experiências autênticas', icon: '🥾' },
+  { title: 'Conteúdo confiável', icon: '💬' },
 ];
 
 export default function NossaCasa() {
@@ -28,26 +18,21 @@ export default function NossaCasa() {
             Trentino-Alto Adige, onde tudo começa.
           </h2>
           <p className="text-stone-700 text-sm leading-relaxed mb-8 max-w-md">
-            Vivemos aqui. Exploramos cada canto desta região durante todas as estações
-            para trazer informações confiáveis, atualizadas e experiências que vão muito
-            além do óbvio.
+            Vivemos aqui, e exploramos cada canto desta região em todas as estações.
           </p>
 
-          <div className="space-y-5 mb-8">
+          <div className="flex flex-wrap gap-x-8 gap-y-4 mb-8">
             {DIFERENCIAIS.map((d) => (
-              <div key={d.title} className="flex gap-3.5">
-                <span className="text-lg leading-none">{d.icon}</span>
-                <div>
-                  <p className="text-sm font-semibold text-forest-900">{d.title}</p>
-                  <p className="text-sm text-stone-700">{d.desc}</p>
-                </div>
+              <div key={d.title} className="flex items-center gap-2.5">
+                <span className="text-base leading-none">{d.icon}</span>
+                <p className="text-sm font-medium text-forest-900">{d.title}</p>
               </div>
             ))}
           </div>
 
-          <a href="#sobre" className="text-sm text-forest-800 underline underline-offset-4 w-fit">
+          <Link to="/sobre" className="text-sm text-forest-800 underline underline-offset-4 w-fit">
             Conhecer a região →
-          </a>
+          </Link>
         </div>
 
         <div className="relative min-h-[380px] lg:min-h-full">
@@ -57,7 +42,6 @@ export default function NossaCasa() {
             className="absolute inset-0 w-full h-full object-cover"
           />
 
-          {/* Endereço/cidade específica removida a pedido da Lídice */}
           <div className="absolute bottom-6 right-6 bg-forest-800/95 text-white rounded-xl p-5 w-48 backdrop-blur-sm">
             <div className="text-2xl mb-2">🗺️</div>
             <p className="font-display text-sm leading-tight mb-1">
