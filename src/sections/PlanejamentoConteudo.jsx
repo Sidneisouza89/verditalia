@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const BENEFICIOS = [
   'Roteiro personalizado',
   'Orientação de especialista local',
@@ -31,17 +33,12 @@ export default function PlanejamentoConteudo() {
                 </li>
               ))}
             </ul>
-            {/*
-              TODO: substituir por embed Cal.com (lê disponibilidade real do
-              Google Calendar da Verditalia e trava agenda mediante pagamento
-              via Stripe). Por ora, âncora de placeholder.
-            */}
-            <a
-              href="#agendar"
+            <Link
+              to="/agendar"
               className="inline-flex items-center gap-2 bg-forest-700 hover:bg-forest-600 transition-colors text-white text-sm px-5 py-3 rounded-md"
             >
               Agendar consultoria →
-            </a>
+            </Link>
           </div>
           <img
             src="https://images.unsplash.com/photo-1499591934245-40b55745b905?auto=format&fit=crop&w=700&q=80"

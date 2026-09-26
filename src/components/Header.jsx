@@ -1,27 +1,37 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const NAV_LINKS = [
-  { label: 'Sobre', href: '#sobre' },
-  { label: 'YouTube', href: '#youtube' },
-  { label: 'Contato', href: '#contato' },
+  { label: 'Sobre', href: '/#sobre' },
+  { label: 'YouTube', href: '/#youtube' },
+  { label: 'Contato', href: '/#contato' },
 ];
 
-export default function Header() {
+// solid=true -> usado em páginas sem imagem de fundo (ex: /agendar),
+// onde o header precisa de cor própria em vez de ficar transparente sobre o hero.
+export default function Header({ solid = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="absolute top-0 left-0 right-0 z-30">
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-6">
-        <a href="#top" className="flex flex-col leading-none group">
+    <header
+      className={
+        solid
+          ? 'relative bg-forest-900 z-30'
+          : 'absolute top-0 left-0 right-0 z-30'
+      }
+    >
+      <div className="max-w-[1400px] mx-auto flex items-center px-6 lg:px-10 py-6">
+        <Link to="/" className="flex flex-col leading-none shrink-0">
           <span className="font-display text-xl md:text-2xl tracking-wide text-white">
             VERDITALIA
           </span>
           <span className="text-[11px] md:text-xs text-white/80 mt-1">
             Vida com natureza e beleza.
           </span>
-        </a>
+        </Link>
 
-        <nav className="hidden lg:flex items-center gap-9">
+        {/* Recuado pra perto do logo (não colado), em vez de centralizado */}
+        <nav className="hidden lg:flex items-center gap-8 ml-14">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
@@ -33,16 +43,16 @@ export default function Header() {
           ))}
         </nav>
 
-        <a
-          href="#planejamento"
-          className="hidden lg:inline-flex items-center gap-2 bg-forest-700 hover:bg-forest-600 transition-colors text-white text-sm px-5 py-3 rounded-md"
+        <Link
+          to="/agendar"
+          className="hidden lg:inline-flex items-center gap-2 bg-forest-700 hover:bg-forest-600 transition-colors text-white text-sm px-5 py-3 rounded-md ml-auto"
         >
           Comece sua viagem
           <span aria-hidden>→</span>
-        </a>
+        </Link>
 
         <button
-          className="lg:hidden text-white"
+          className="lg:hidden text-white ml-auto"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Abrir menu"
         >
@@ -59,12 +69,12 @@ export default function Header() {
               {link.label.toUpperCase()}
             </a>
           ))}
-          <a
-            href="#planejamento"
+          <Link
+            to="/agendar"
             className="inline-flex items-center gap-2 bg-forest-600 text-white text-sm px-5 py-3 rounded-md w-fit"
           >
             Comece sua viagem →
-          </a>
+          </Link>
         </div>
       )}
     </header>

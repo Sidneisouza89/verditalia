@@ -8,9 +8,9 @@ export default function Footer() {
         </div>
 
         <nav className="flex flex-wrap justify-center gap-6 text-sm">
-          <a href="#sobre" className="hover:text-white transition-colors">Sobre</a>
+          <a href="/#sobre" className="hover:text-white transition-colors">Sobre</a>
           <a href="https://www.youtube.com/@verditalia" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">YouTube</a>
-          <a href="#contato" className="hover:text-white transition-colors">Contato</a>
+          <a href="/#contato" className="hover:text-white transition-colors">Contato</a>
         </nav>
 
         <div className="flex gap-4 text-white/70 text-lg">
