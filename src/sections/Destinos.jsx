@@ -41,6 +41,47 @@ const DESTINOS = [
   },
 ];
 
+// Link de checkout do combo na Hotmart (produto "Combo" com todos os guias).
+// Enquanto estiver vazio, o botão aparece com o selo "em breve" e não é clicável.
+// Quando a Lídice criar o combo, é só colar o link aqui.
+const COMBO_URL = '';
+
+function BotaoCombo() {
+  const conteudo = (
+    <>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+        <path d="M4 7h16l-1.5 11.5a2 2 0 0 1-2 1.5h-9a2 2 0 0 1-2-1.5L4 7z" strokeLinejoin="round" />
+        <path d="M9 10V6a3 3 0 0 1 6 0v4" strokeLinecap="round" />
+      </svg>
+      Comprar todos os guias
+    </>
+  );
+  const base =
+    'inline-flex items-center gap-3 border border-forest-900/25 bg-white text-forest-900 text-sm font-medium px-6 py-3 rounded-md';
+
+  if (!COMBO_URL) {
+    return (
+      <span className={`${base} cursor-default`} aria-disabled="true">
+        {conteudo}
+        <span className="text-[10px] uppercase tracking-wide bg-cream-200 text-forest-600 px-2 py-0.5 rounded">
+          em breve
+        </span>
+      </span>
+    );
+  }
+
+  return (
+    <a
+      href={COMBO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${base} hover:border-forest-600 hover:bg-cream-100 transition-colors`}
+    >
+      {conteudo}
+    </a>
+  );
+}
+
 export default function Destinos() {
   return (
     <section id="guias" className="max-w-[1800px] mx-auto px-4 lg:px-6 py-10 md:py-14">
@@ -59,7 +100,10 @@ export default function Destinos() {
         ))}
       </div>
 
-      {/* Botão "Comparar todos os guias" removido -> não é possível pela forma como a Hotmart vende */}
+      <div className="mt-8 flex flex-col items-center gap-2 text-center">
+        <BotaoCombo />
+        <p className="text-xs text-stone-700">Leve os guias juntos em uma única compra.</p>
+      </div>
     </section>
   );
 }
