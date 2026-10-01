@@ -3,17 +3,39 @@ import { useState } from 'react';
 export default function Contato() {
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState('');
 
-  // TODO: trocar por chamada real a uma rota de backend (Railway) que recebe
-  // o POST e dispara o e-mail via Resend/SendGrid. O e-mail/telefone da
-  // Lídice nunca trafega para o frontend nem aparece no código-fonte.
-  function handleSubmit(e) {
+  // Envia para o backend (server.js no Railway), que dispara o e-mail via Resend.
+  // O e-mail da Lídice fica só nas variáveis do Railway — nunca chega ao navegador.
+  async function handleSubmit(e) {
     e.preventDefault();
+    setErro('');
     setEnviando(true);
-    setTimeout(() => {
-      setEnviando(false);
+
+    const form = new FormData(e.currentTarget);
+    const payload = {
+      nome: form.get('nome'),
+      email: form.get('email'),
+      mensagem: form.get('mensagem'),
+      site: form.get('site'), // honeypot anti-robô
+    };
+
+    try {
+      const r = await fetch('/api/contato', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok || !data.ok) {
+        throw new Error(data.error || 'Não foi possível enviar agora. Tente novamente mais tarde.');
+      }
       setEnviado(true);
-    }, 900);
+    } catch (err) {
+      setErro(err.message || 'Não foi possível enviar agora. Tente novamente mais tarde.');
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
@@ -39,6 +61,7 @@ export default function Contato() {
             </label>
             <input
               id="nome"
+              name="nome"
               type="text"
               required
               className="w-full border border-forest-900/15 rounded-md px-4 py-3 text-sm bg-white outline-none focus:border-forest-600"
@@ -50,6 +73,7 @@ export default function Contato() {
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               required
               className="w-full border border-forest-900/15 rounded-md px-4 py-3 text-sm bg-white outline-none focus:border-forest-600"
@@ -61,11 +85,22 @@ export default function Contato() {
             </label>
             <textarea
               id="mensagem"
+              name="mensagem"
               required
               rows={5}
               className="w-full border border-forest-900/15 rounded-md px-4 py-3 text-sm bg-white outline-none focus:border-forest-600 resize-none"
             />
           </div>
+          {/* Honeypot: invisível para pessoas, robôs costumam preencher */}
+          <div aria-hidden="true" className="absolute -left-[9999px] w-px h-px overflow-hidden">
+            <label htmlFor="site">Não preencha este campo</label>
+            <input id="site" name="site" type="text" tabIndex={-1} autoComplete="off" />
+          </div>
+          {erro && (
+            <p role="alert" className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-4 py-3">
+              {erro}
+            </p>
+          )}
           <button
             type="submit"
             disabled={enviando}
