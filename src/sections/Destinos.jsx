@@ -57,7 +57,7 @@ function BotaoCombo() {
     </>
   );
   const base =
-    'inline-flex items-center gap-3 border border-forest-900/25 bg-white text-forest-900 text-sm font-medium px-6 py-3 rounded-md';
+    'inline-flex items-center gap-3 border-2 border-forest-900/40 bg-white text-forest-900 text-sm font-medium px-6 py-3 rounded-md';
 
   if (!COMBO_URL) {
     return (
@@ -100,9 +100,8 @@ export default function Destinos() {
         ))}
       </div>
 
-      <div className="mt-8 flex flex-col items-center gap-2 text-center">
+      <div className="mt-8 flex justify-center">
         <BotaoCombo />
-        <p className="text-xs text-stone-700">Leve os guias juntos em uma única compra.</p>
       </div>
     </section>
   );
