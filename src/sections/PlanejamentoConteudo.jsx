@@ -7,11 +7,11 @@ const BENEFICIOS = [
   'Experiências e lugares selecionados',
 ];
 
-// Vinheta radial: dissolve as bordas da imagem revelando o fundo por trás,
-// em vez de terminar numa borda reta. Usada nas fotos de destaque desta seção.
+// Esmaece só a borda esquerda da foto (lado do texto), dissolvendo no fundo.
+// O lado direito fica sólido, sem efeito.
 const fadeEdges = {
-  WebkitMaskImage: 'radial-gradient(ellipse at center, black 62%, transparent 100%)',
-  maskImage: 'radial-gradient(ellipse at center, black 62%, transparent 100%)',
+  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 35%)',
+  maskImage: 'linear-gradient(to right, transparent 0%, black 35%)',
 };
 
 export default function PlanejamentoConteudo() {
@@ -19,8 +19,8 @@ export default function PlanejamentoConteudo() {
     <section id="planejamento" className="bg-cream-200">
       <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2">
         {/* Planejamento / Consultoria */}
-        <div className="grid md:grid-cols-2 items-center gap-8 px-6 lg:px-10 py-10 md:py-14 border-b lg:border-b-0 lg:border-r border-forest-900/10">
-          <div>
+        <div className="grid md:grid-cols-2 items-stretch gap-0 md:gap-8 px-6 lg:px-10 border-b lg:border-b-0 lg:border-r border-forest-900/10">
+          <div className="py-8">
             <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
               PLANEJAMENTO PERSONALIZADO
             </p>
@@ -30,7 +30,7 @@ export default function PlanejamentoConteudo() {
             <p className="text-stone-700 text-sm leading-relaxed mb-6">
               Criamos roteiros sob medida com base no seu perfil, tempo disponível, interesses e orçamento.
             </p>
-            <ul className="space-y-2.5 mb-7">
+            <ul className="space-y-2 mb-6">
               {BENEFICIOS.map((b) => (
                 <li key={b} className="flex items-center gap-2.5 text-sm text-forest-900">
                   <span className="w-4 h-4 rounded-full bg-forest-700 text-white flex items-center justify-center text-[10px] shrink-0">
@@ -50,14 +50,14 @@ export default function PlanejamentoConteudo() {
           <img
             src="https://images.unsplash.com/photo-1499591934245-40b55745b905?auto=format&fit=crop&w=700&q=80"
             alt="Mesa de planejamento de viagem com mapa e caneca Verditalia"
-            className="h-64 md:h-80 w-full object-cover"
+            className="h-56 md:h-full w-full object-cover"
             style={fadeEdges}
           />
         </div>
 
         {/* YouTube */}
-        <div id="youtube" className="grid md:grid-cols-2 items-center gap-8 px-6 lg:px-10 py-10 md:py-14">
-          <div>
+        <div id="youtube" className="grid md:grid-cols-2 items-stretch gap-0 md:gap-8 px-6 lg:px-10">
+          <div className="py-8 md:self-center">
             <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
               CONTEÚDO EM CAMPO
             </p>
@@ -88,7 +88,7 @@ export default function PlanejamentoConteudo() {
             href="https://youtu.be/Wg-2UbbbzhY"
             target="_blank"
             rel="noopener noreferrer"
-            className="relative h-64 md:h-80 block group"
+            className="relative h-56 md:h-auto block group"
           >
             {/* mask aplicada no wrapper (foto + overlay escuro juntos) */}
             <div className="absolute inset-0" style={fadeEdges}>
@@ -103,7 +103,7 @@ export default function PlanejamentoConteudo() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-forest-900/85 via-forest-900/10 to-transparent" />
             </div>
-            <span className="absolute top-3 left-3 bg-forest-800/80 text-white text-[10px] px-2.5 py-1 rounded-full">
+            <span className="absolute top-3 right-3 bg-forest-800/80 text-white text-[10px] px-2.5 py-1 rounded-full">
               Último vídeo
             </span>
             <span className="absolute inset-0 m-auto w-14 h-14 rounded-full bg-white/90 flex items-center justify-center text-lg">
