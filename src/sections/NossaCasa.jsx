@@ -34,9 +34,9 @@ const fadeLeft = {
 
 export default function NossaCasa() {
   return (
-    <section className="bg-cream-100 grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+    <section id="nossa-casa" className="bg-cream-100 grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
       {/* Texto + diferenciais */}
-      <div className="grid md:grid-cols-[1.45fr_1fr] items-center gap-8 md:gap-0 px-6 lg:pl-10 lg:pr-4 py-8 md:py-10">
+      <div className="grid md:grid-cols-[1.45fr_1fr] items-center gap-8 md:gap-0 px-6 lg:pl-10 lg:pr-4 py-10 md:py-14">
         <div className="md:pr-8 md:border-r border-forest-900/15">
           <p className="text-[11px] md:text-xs tracking-[0.08em] uppercase text-forest-600 font-medium mb-3">
             Nossa casa

@@ -84,7 +84,7 @@ function BotaoCombo() {
 
 export default function Destinos() {
   return (
-    <section id="guias" className="max-w-[1800px] mx-auto px-4 lg:px-6 py-10 md:py-14">
+    <section id="guias" className="max-w-[1800px] mx-auto px-4 lg:px-6 pt-10 md:pt-14 pb-6 md:pb-8">
       <div className="text-center mb-10">
         <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
           NOSSOS GUIAS AUTORAIS
@@ -100,7 +100,7 @@ export default function Destinos() {
         ))}
       </div>
 
-      <div className="mt-8 flex justify-center">
+      <div className="mt-6 flex justify-center">
         <BotaoCombo />
       </div>
     </section>
