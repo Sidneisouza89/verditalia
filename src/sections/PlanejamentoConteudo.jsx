@@ -17,9 +17,9 @@ const fadeEdges = {
 export default function PlanejamentoConteudo() {
   return (
     <section id="planejamento" className="bg-cream-200">
-      <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2">
+      <div className="grid lg:grid-cols-2">
         {/* Planejamento / Consultoria */}
-        <div className="grid md:grid-cols-2 items-stretch gap-0 md:gap-8 px-6 lg:px-10 border-b lg:border-b-0 lg:border-r border-forest-900/10">
+        <div className="grid md:grid-cols-2 items-stretch gap-0 md:gap-8 px-6 md:pr-0 lg:pl-10 border-b lg:border-b-0 lg:border-r border-forest-900/10">
           <div className="py-8">
             <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
               PLANEJAMENTO PERSONALIZADO
@@ -56,7 +56,7 @@ export default function PlanejamentoConteudo() {
         </div>
 
         {/* YouTube */}
-        <div id="youtube" className="grid md:grid-cols-2 items-stretch gap-0 md:gap-8 px-6 lg:px-10">
+        <div id="youtube" className="grid md:grid-cols-2 items-stretch gap-0 md:gap-8 px-6 md:pr-0 lg:pl-10">
           <div className="py-8 md:self-center">
             <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
               CONTEÚDO EM CAMPO
