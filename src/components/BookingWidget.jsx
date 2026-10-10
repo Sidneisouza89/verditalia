@@ -1,0 +1,446 @@
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useText } from '../i18n/LanguageContext';
+
+/*
+  Widget de agendamento (protótipo para validação com a Lídice).
+  - Abre sempre no mês atual; navega até MONTHS_AHEAD meses à frente.
+  - Horários definidos no fuso da Itália e mostrados no fuso do visitante.
+  - Disponibilidade é DE EXEMPLO: no futuro vem do Google Calendar (Cal.com),
+    e o botão de continuar leva ao pagamento (Stripe).
+*/
+
+const ROME_SLOTS = ['13:00', '14:30', '16:00', '17:30', '19:00']; // tarde na Itália = manhã no Brasil
+const MONTHS_AHEAD = 2;
+const MIN_NOTICE_DAYS = 2;
+const DURATION_MIN = 60;
+
+const TEXT = {
+  pt: {
+    locale: 'pt-BR',
+    com: 'Com',
+    titulo: 'Consultoria de viagem personalizada',
+    duracao: `${DURATION_MIN} minutos`,
+    formato: 'Videochamada (link enviado após o pagamento)',
+    regiao: 'Trentino-Alto Adige, Dolomitas e roteiros pela Itália',
+    entrega: 'Roteiro personalizado enviado depois da conversa',
+    valor: 'Valor da consultoria',
+    valorNota: 'Valor a definir. Pagamento seguro via Stripe.',
+    dow: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+    mesAnterior: 'Mês anterior',
+    proximoMes: 'Próximo mês',
+    escolherMes: 'Escolher mês',
+    livres: 'Com horários livres',
+    selecionado: 'Selecionado',
+    semHorarios: 'sem horários',
+    horariosLivres: (n) => `${n} horários livres`,
+    escolhaDia: 'Escolha um dia',
+    vazio: 'Os horários disponíveis aparecem aqui.',
+    seuFuso: (c) => `Horários no seu fuso (${c})`,
+    naItalia: 'na Itália',
+    seuHorario: 'seu horário',
+    continuar: 'Continuar para pagamento',
+    reserva: 'A vaga fica reservada por 15 minutos enquanto você conclui o pagamento.',
+    emBreve: 'O pagamento online chega em breve. Por enquanto,',
+    faleConosco: 'fale com a gente para reservar este horário',
+    estacoes: {
+      inverno: ['Inverno', 'Neve nas Dolomitas'],
+      primavera: ['Primavera', 'Flores nos vales'],
+      verao: ['Verão', 'Trilhas e lagos'],
+      outono: ['Outono', 'Vindima e folhagem'],
+    },
+  },
+  en: {
+    locale: 'en-GB',
+    com: 'With',
+    titulo: 'Personalized travel consultation',
+    duracao: `${DURATION_MIN} minutes`,
+    formato: 'Video call (link sent after payment)',
+    regiao: 'Trentino-Alto Adige, the Dolomites and trips across Italy',
+    entrega: 'Personalized itinerary sent after the call',
+    valor: 'Consultation fee',
+    valorNota: 'Fee to be confirmed. Secure payment via Stripe.',
+    dow: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    mesAnterior: 'Previous month',
+    proximoMes: 'Next month',
+    escolherMes: 'Choose a month',
+    livres: 'Available',
+    selecionado: 'Selected',
+    semHorarios: 'no times available',
+    horariosLivres: (n) => `${n} times available`,
+    escolhaDia: 'Choose a day',
+    vazio: 'Available times will appear here.',
+    seuFuso: (c) => `Times in your time zone (${c})`,
+    naItalia: 'in Italy',
+    seuHorario: 'your time',
+    continuar: 'Continue to payment',
+    reserva: 'Your slot is held for 15 minutes while you complete the payment.',
+    emBreve: 'Online payment is coming soon. For now,',
+    faleConosco: 'contact us to book this time',
+    estacoes: {
+      inverno: ['Winter', 'Snow in the Dolomites'],
+      primavera: ['Spring', 'Flowers in the valleys'],
+      verao: ['Summer', 'Trails and lakes'],
+      outono: ['Autumn', 'Grape harvest and foliage'],
+    },
+  },
+};
+
+// ---------- ícones ----------
+const Svg = ({ size = 14, children, strokeWidth = 1.6 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth}
+    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+    {children}
+  </svg>
+);
+
+const SEASON_ICONS = {
+  inverno: (
+    <Svg>
+      <path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7" />
+      <path d="M9.5 4L12 6.5 14.5 4M9.5 20l2.5-2.5 2.5 2.5M4.2 10.2l3.4-.9-.9-3.4M19.8 13.8l-3.4.9.9 3.4M4.2 13.8l3.4.9-.9 3.4M19.8 10.2l-3.4-.9.9-3.4" />
+    </Svg>
+  ),
+  primavera: (
+    <Svg>
+      <circle cx="12" cy="12" r="2.5" />
+      <path d="M12 9.5C10 6 10.5 3.5 12 3c1.5.5 2 3 0 6.5zM12 14.5c2 3.5 1.5 6 0 6.5-1.5-.5-2-3 0-6.5zM9.5 12C6 14 3.5 13.5 3 12c.5-1.5 3-2 6.5 0zM14.5 12c3.5-2 6-1.5 6.5 0-.5 1.5-3 2-6.5 0z" />
+    </Svg>
+  ),
+  verao: (
+    <Svg>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" />
+    </Svg>
+  ),
+  outono: (
+    <Svg>
+      <path d="M5 19C5 10 10 5 20 4c-1 10-6 15-15 15z" />
+      <path d="M5 19l8-8" />
+    </Svg>
+  ),
+};
+
+// Estações na Itália (hemisfério norte)
+function seasonKey(monthIndex) {
+  if (monthIndex === 11 || monthIndex <= 1) return 'inverno';
+  if (monthIndex <= 4) return 'primavera';
+  if (monthIndex <= 7) return 'verao';
+  return 'outono';
+}
+
+// ---------- datas e fusos ----------
+function tzOffset(date, tz) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+    .formatToParts(date)
+    .reduce((o, p) => ((o[p.type] = p.value), o), {});
+  const asUtc = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute, +parts.second);
+  return asUtc - date.getTime();
+}
+
+// "HH:MM" no horário de Roma, naquele dia -> instante real
+function romeInstant(day, hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  const guess = Date.UTC(day.getFullYear(), day.getMonth(), day.getDate(), h, m);
+  return new Date(guess - tzOffset(new Date(guess), 'Europe/Rome'));
+}
+
+const startOfToday = () => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+const sameDay = (a, b) => !!a && !!b && a.getTime() === b.getTime();
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+// Disponibilidade de exemplo, estável por data
+function exampleSlots(day, minDay) {
+  const wd = day.getDay();
+  if (wd === 0 || wd === 6 || day < minDay) return [];
+  const s = ((day.getFullYear() * 372 + day.getMonth() * 31 + day.getDate()) * 2654435761) % 4294967296;
+  if (s % 7 === 0) return [];
+  return ROME_SLOTS.filter((_, i) => ((s >> (i * 3)) & 7) > 2);
+}
+
+// ---------- componente ----------
+export default function BookingWidget() {
+  const t = useText(TEXT);
+
+  const { today, first, last, minDay, visitorTz } = useMemo(() => {
+    const today = startOfToday();
+    const minDay = new Date(today);
+    minDay.setDate(minDay.getDate() + MIN_NOTICE_DAYS);
+    return {
+      today,
+      minDay,
+      first: new Date(today.getFullYear(), today.getMonth(), 1),
+      last: new Date(today.getFullYear(), today.getMonth() + MONTHS_AHEAD, 1),
+      visitorTz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Sao_Paulo',
+    };
+  }, []);
+
+  const fmt = useMemo(
+    () => ({
+      month: new Intl.DateTimeFormat(t.locale, { month: 'long' }),
+      tab: new Intl.DateTimeFormat(t.locale, { month: 'short' }),
+      longDay: new Intl.DateTimeFormat(t.locale, { weekday: 'long', day: 'numeric', month: 'long' }),
+      local: new Intl.DateTimeFormat(t.locale, { hour: '2-digit', minute: '2-digit', timeZone: visitorTz }),
+      rome: new Intl.DateTimeFormat(t.locale, { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' }),
+    }),
+    [t.locale, visitorTz]
+  );
+
+  const slotsFor = (d) => exampleSlots(d, minDay);
+
+  // Abre sempre no mês atual, já com o primeiro dia livre dele selecionado
+  const [view, setView] = useState(first);
+  const [selectedDay, setSelectedDay] = useState(() => {
+    for (const d = new Date(minDay); d.getMonth() === today.getMonth(); d.setDate(d.getDate() + 1)) {
+      if (exampleSlots(d, minDay).length) return new Date(d);
+    }
+    return null;
+  });
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [tentouPagar, setTentouPagar] = useState(false);
+
+  function goTo(month) {
+    setView(month);
+    if (selectedDay && (selectedDay.getMonth() !== month.getMonth() || selectedDay.getFullYear() !== month.getFullYear())) {
+      setSelectedDay(null);
+      setSelectedSlot(null);
+    }
+    setTentouPagar(false);
+  }
+
+  const months = Array.from({ length: MONTHS_AHEAD + 1 }, (_, i) => new Date(first.getFullYear(), first.getMonth() + i, 1));
+  const season = seasonKey(view.getMonth());
+  const [seasonName, seasonHint] = t.estacoes[season];
+
+  const lead = (view.getDay() + 6) % 7; // semana começa na segunda
+  const daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+  const days = Array.from({ length: daysInMonth }, (_, i) => new Date(view.getFullYear(), view.getMonth(), i + 1));
+
+  const daySlots = selectedDay ? slotsFor(selectedDay).map((hhmm) => romeInstant(selectedDay, hhmm)) : [];
+  const city = visitorTz.split('/').pop().replace(/_/g, ' ');
+
+  const fact = 'flex gap-2.5 items-start text-[13.5px] text-stone-700';
+
+  return (
+    <section
+      aria-label={t.titulo}
+      className="bg-white border border-forest-900/10 rounded-2xl shadow-[0_12px_32px_-18px_rgba(30,42,23,0.25)] grid md:grid-cols-2 lg:grid-cols-[0.9fr_1.3fr_0.8fr] overflow-hidden"
+    >
+      {/* Painel 1: a consultoria */}
+      <div className="p-6 lg:p-7 min-w-0 md:col-span-2 lg:col-span-1 border-b lg:border-b-0 lg:border-r border-forest-900/10">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-11 h-11 rounded-full bg-forest-700 text-cream-100 grid place-items-center font-display text-lg" aria-hidden="true">
+            L
+          </div>
+          <div>
+            <p className="text-xs text-stone-700/70">{t.com}</p>
+            <p className="text-sm font-medium">Lídice · Verditalia</p>
+          </div>
+        </div>
+        <h2 className="font-display text-[22px] leading-tight text-forest-900 mb-4">{t.titulo}</h2>
+        <ul className="grid gap-2.5 mb-5">
+          <li className={fact}>
+            <span className="text-forest-600 mt-0.5"><Svg size={16}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Svg></span>
+            {t.duracao}
+          </li>
+          <li className={fact}>
+            <span className="text-forest-600 mt-0.5"><Svg size={16}><rect x="3" y="6" width="13" height="12" rx="2" /><path d="M16 10l5-3v10l-5-3" /></Svg></span>
+            {t.formato}
+          </li>
+          <li className={fact}>
+            <span className="text-forest-600 mt-0.5"><Svg size={16}><path d="M2.5 19.5L9 8l4 7 2.5-4 6 8.5h-19z" /></Svg></span>
+            {t.regiao}
+          </li>
+          <li className={fact}>
+            <span className="text-forest-600 mt-0.5"><Svg size={16}><path d="M5 12.5l4.5 4.5L19 7.5" /></Svg></span>
+            {t.entrega}
+          </li>
+        </ul>
+        <div className="border-t border-forest-900/10 pt-4 flex justify-between items-baseline gap-2">
+          <span className="text-xs text-stone-700/70">{t.valor}</span>
+          <strong className="font-display font-normal text-[22px]">€ —</strong>
+        </div>
+        <p className="text-xs text-stone-700/70 mt-2.5">{t.valorNota}</p>
+      </div>
+
+      {/* Painel 2: calendário */}
+      <div className="p-6 lg:p-7 min-w-0 lg:border-r border-forest-900/10">
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <h3 className="flex items-center gap-2 flex-wrap text-base font-medium" aria-live="polite">
+            <span>
+              {cap(fmt.month.format(view))} <span className="font-normal text-stone-700/60">{view.getFullYear()}</span>
+            </span>
+            <span title={seasonHint} className="inline-flex items-center gap-1.5 text-[11px] font-medium text-forest-600 bg-cream-200 rounded-full pl-2 pr-2.5 py-0.5">
+              {SEASON_ICONS[season]}
+              {seasonName}
+            </span>
+          </h3>
+          <div className="flex gap-1.5">
+            {[
+              { label: t.mesAnterior, delta: -1, d: 'M15 6l-6 6 6 6', disabled: view.getTime() <= first.getTime() },
+              { label: t.proximoMes, delta: 1, d: 'M9 6l6 6-6 6', disabled: view.getTime() >= last.getTime() },
+            ].map((a) => (
+              <button
+                key={a.delta}
+                type="button"
+                aria-label={a.label}
+                disabled={a.disabled}
+                onClick={() => goTo(new Date(view.getFullYear(), view.getMonth() + a.delta, 1))}
+                className="w-[34px] h-[34px] rounded-lg border border-forest-900/20 bg-white grid place-items-center transition-colors enabled:hover:bg-cream-200 enabled:hover:border-forest-600 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <Svg size={16} strokeWidth={1.8}><path d={a.d} /></Svg>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-1.5 flex-wrap mb-4" role="group" aria-label={t.escolherMes}>
+          {months.map((m) => {
+            const active = m.getTime() === view.getTime();
+            const sk = seasonKey(m.getMonth());
+            return (
+              <button
+                key={m.getTime()}
+                type="button"
+                aria-pressed={active}
+                title={t.estacoes[sk].join(' · ')}
+                onClick={() => goTo(m)}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition-colors ${
+                  active ? 'bg-forest-700 border-forest-700 text-white' : 'bg-cream-100 border-forest-900/10 hover:border-forest-600'
+                }`}
+              >
+                {SEASON_ICONS[sk]}
+                {cap(fmt.tab.format(m).replace('.', ''))}
+                {m.getFullYear() !== today.getFullYear() ? ` ${m.getFullYear()}` : ''}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-7 gap-1">
+          {t.dow.map((d) => (
+            <div key={d} className="text-[11px] tracking-[0.08em] uppercase text-stone-700/60 text-center pb-1.5">
+              {d}
+            </div>
+          ))}
+          {Array.from({ length: lead }, (_, i) => (
+            <div key={`v${i}`} />
+          ))}
+          {days.map((d) => {
+            const free = slotsFor(d).length;
+            const isSel = sameDay(d, selectedDay);
+            const isToday = sameDay(d, today);
+            return (
+              <button
+                key={d.getTime()}
+                type="button"
+                disabled={!free}
+                aria-pressed={free ? isSel : undefined}
+                aria-label={`${fmt.longDay.format(d)}, ${free ? t.horariosLivres(free) : t.semHorarios}`}
+                onClick={() => {
+                  setSelectedDay(d);
+                  setSelectedSlot(null);
+                  setTentouPagar(false);
+                }}
+                className={`relative aspect-square rounded-[10px] border text-sm tabular-nums grid place-items-center transition-colors ${
+                  isSel
+                    ? 'bg-forest-700 border-forest-700 text-white font-medium'
+                    : free
+                    ? 'bg-cream-200 border-transparent font-medium hover:border-forest-600'
+                    : 'border-transparent text-forest-900/30 cursor-default'
+                }`}
+              >
+                {d.getDate()}
+                {isToday && (
+                  <span className={`absolute bottom-1.5 w-1 h-1 rounded-full ${isSel ? 'bg-white' : 'bg-forest-500'}`} aria-hidden="true" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex gap-4 flex-wrap mt-4 text-xs text-stone-700/70">
+          <span className="inline-flex items-center gap-1.5">
+            <i className="w-3 h-3 rounded bg-cream-200 border border-forest-900/10" />
+            {t.livres}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <i className="w-3 h-3 rounded bg-forest-700" />
+            {t.selecionado}
+          </span>
+        </div>
+      </div>
+
+      {/* Painel 3: horários */}
+      <div className="p-6 lg:p-7 min-w-0 border-t md:border-t-0 md:border-l lg:border-l-0 border-forest-900/10">
+        <p className="text-sm font-medium mb-1">{selectedDay ? cap(fmt.longDay.format(selectedDay)) : t.escolhaDia}</p>
+        <p className="text-xs text-stone-700/70 mb-4">{t.seuFuso(city)}</p>
+
+        {selectedDay ? (
+          <div className="grid gap-2">
+            {daySlots.map((at) => {
+              const active = sameDay(at, selectedSlot);
+              return (
+                <button
+                  key={at.getTime()}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => {
+                    setSelectedSlot(at);
+                    setTentouPagar(false);
+                  }}
+                  className={`flex justify-between items-baseline gap-2 rounded-lg border px-3 py-2.5 text-left tabular-nums transition-colors ${
+                    active ? 'bg-forest-700 border-forest-700 text-white' : 'bg-white border-forest-900/20 hover:border-forest-600'
+                  }`}
+                >
+                  <b className="font-medium text-sm">{fmt.local.format(at)}</b>
+                  <small className={`text-[11px] ${active ? 'text-white/70' : 'text-stone-700/70'}`}>
+                    {fmt.rome.format(at)} {t.naItalia}
+                  </small>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-[13px] text-stone-700/70 py-4">{t.vazio}</p>
+        )}
+
+        {selectedDay && selectedSlot && (
+          <div className="mt-4 grid gap-2.5">
+            <div className="bg-cream-200 rounded-[10px] px-3.5 py-3 text-[13px]">
+              <strong className="block font-medium">{cap(fmt.longDay.format(selectedDay))}</strong>
+              {fmt.local.format(selectedSlot)} ({t.seuHorario}) · {fmt.rome.format(selectedSlot)} {t.naItalia} · {DURATION_MIN} min
+            </div>
+            <button
+              type="button"
+              onClick={() => setTentouPagar(true)}
+              className="inline-flex justify-center items-center gap-2 rounded-lg bg-forest-600 hover:bg-forest-500 transition-colors text-white text-sm font-medium px-4 py-3"
+            >
+              {t.continuar}
+              <Svg size={16} strokeWidth={1.8}><path d="M5 12h14M13 6l6 6-6 6" /></Svg>
+            </button>
+            {/* Enquanto o Stripe não estiver ligado, o visitante é levado ao formulário de contato */}
+            {tentouPagar ? (
+              <p className="text-[12px] text-forest-900 bg-cream-100 border border-forest-900/10 rounded-md px-3 py-2" role="status">
+                {t.emBreve}{' '}
+                <Link to="/contato" className="underline underline-offset-2">
+                  {t.faleConosco}
+                </Link>
+                .
+              </p>
+            ) : (
+              <p className="text-[11.5px] text-stone-700/70">{t.reserva}</p>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
