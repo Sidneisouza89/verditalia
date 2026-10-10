@@ -113,6 +113,7 @@ async function handleContato(req, res) {
   const nome = String(data.nome || '').trim().slice(0, 120);
   const email = String(data.email || '').trim().slice(0, 200);
   const mensagem = String(data.mensagem || '').trim().slice(0, 5000);
+  const idioma = data.idioma === 'en' ? 'Inglês (EN)' : 'Português (PT)';
 
   if (!nome || !mensagem || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return sendJson(res, 400, { ok: false, error: 'Preencha nome, um e-mail válido e a mensagem.' });
@@ -129,6 +130,7 @@ async function handleContato(req, res) {
       <h2 style="color:#1f3d2b;margin:0 0 16px">Nova mensagem pelo site Verditalia</h2>
       <p><strong>Nome:</strong> ${escapeHtml(nome)}</p>
       <p><strong>E-mail:</strong> ${escapeHtml(email)}</p>
+      <p><strong>Idioma do site:</strong> ${idioma}</p>
       <p><strong>Mensagem:</strong></p>
       <p style="white-space:pre-wrap;background:#f6f3ea;padding:12px 16px;border-radius:8px">${escapeHtml(mensagem)}</p>
       <p style="color:#777;font-size:12px;margin-top:24px">Responda este e-mail para falar direto com ${escapeHtml(nome)}.</p>
@@ -145,9 +147,9 @@ async function handleContato(req, res) {
         from: CONTACT_FROM,
         to: CONTACT_TO.split(',').map((s) => s.trim()).filter(Boolean),
         reply_to: email,
-        subject: `Contato pelo site — ${nome}`,
+        subject: `Contato pelo site — ${nome}${data.idioma === 'en' ? ' [EN]' : ''}`,
         html,
-        text: `Nome: ${nome}\nE-mail: ${email}\n\n${mensagem}`,
+        text: `Nome: ${nome}\nE-mail: ${email}\nIdioma do site: ${idioma}\n\n${mensagem}`,
       }),
     });
 

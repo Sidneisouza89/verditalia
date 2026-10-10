@@ -17,3 +17,12 @@ body {
 .font-display {
   font-family: 'Fraunces', serif;
 }
+
+/* Degradê na borda esquerda da foto, só a partir do tablet (md).
+   No celular a foto fica embaixo do texto, então aparece inteira. */
+@media (min-width: 768px) {
+  .md-fade-left {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black var(--fade, 35%));
+    mask-image: linear-gradient(to right, transparent 0%, black var(--fade, 35%));
+  }
+}

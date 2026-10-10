@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import MountainMark from '../components/MountainMark';
+import { useText } from '../i18n/LanguageContext';
 
 const INSTAGRAM = 'https://www.instagram.com/verditalia__';
 const YOUTUBE = 'https://www.youtube.com/@verditalia';
@@ -36,46 +37,81 @@ const IconeLocal = () => (
   </svg>
 );
 
-const COLUNAS = [
-  {
-    titulo: 'Destinos',
-    links: [
-      { label: 'Dolomitas', to: '/#guias' },
-      { label: 'Umbria', to: '/#guias' },
-      { label: 'Roma', to: '/#guias' },
-      { label: 'Trentino-Alto Adige', to: '/#nossa-casa' },
+const TEXT = {
+  pt: {
+    tagline: 'Vida com natureza e beleza.',
+    local: 'Trentino-Alto Adige, Itália',
+    email: 'Enviar e-mail',
+    direitos: 'Todos os direitos reservados.',
+    privacidade: 'Política de Privacidade',
+    termos: 'Termos de Uso',
+    colunas: [
+      {
+        titulo: 'Destinos',
+        links: [
+          { label: 'Dolomitas', to: '/#guias' },
+          { label: 'Umbria', to: '/#guias' },
+          { label: 'Roma', to: '/#guias' },
+          { label: 'Trentino-Alto Adige', to: '/#nossa-casa' },
+        ],
+      },
+      {
+        titulo: 'Planejamento',
+        links: [
+          { label: 'Consultoria personalizada', to: '/agendar' },
+          { label: 'Fale conosco', to: '/contato' },
+        ],
+      },
+      { titulo: 'Verditalia', links: [{ label: 'Sobre nós', to: '/sobre' }] },
     ],
   },
-  {
-    titulo: 'Planejamento',
-    links: [
-      { label: 'Consultoria personalizada', to: '/agendar' },
-      { label: 'Fale conosco', to: '/contato' },
+  en: {
+    tagline: 'Life with nature and beauty.',
+    local: 'Trentino-Alto Adige, Italy',
+    email: 'Send an email',
+    direitos: 'All rights reserved.',
+    privacidade: 'Privacy Policy',
+    termos: 'Terms of Use',
+    colunas: [
+      {
+        titulo: 'Destinations',
+        links: [
+          { label: 'Dolomites', to: '/#guias' },
+          { label: 'Umbria', to: '/#guias' },
+          { label: 'Rome', to: '/#guias' },
+          { label: 'Trentino-Alto Adige', to: '/#nossa-casa' },
+        ],
+      },
+      {
+        titulo: 'Planning',
+        links: [
+          { label: 'Personalized consultation', to: '/agendar' },
+          { label: 'Contact us', to: '/contato' },
+        ],
+      },
+      { titulo: 'Verditalia', links: [{ label: 'About us', to: '/sobre' }] },
     ],
   },
-  {
-    titulo: 'Verditalia',
-    links: [{ label: 'Sobre nós', to: '/sobre' }],
-  },
-];
+};
 
 const linkClass = 'text-sm text-white/75 hover:text-white transition-colors';
 
 export default function Footer() {
+  const t = useText(TEXT);
   return (
     <footer className="bg-forest-900 text-white">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-12 pb-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-12 pb-10 grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
         {/* Marca */}
-        <div>
+        <div className="col-span-2 lg:col-span-1">
           <Link to="/" className="inline-flex flex-col items-start mb-5">
             <MountainMark className="h-6 w-auto text-white/90 mb-1" />
             <span className="font-display text-2xl tracking-[0.08em] leading-none">VERDITALIA</span>
-            <span className="text-xs text-white/70 mt-1.5">Vida com natureza e beleza.</span>
+            <span className="text-xs text-white/70 mt-1.5">{t.tagline}</span>
           </Link>
 
           <p className="flex items-center gap-2 text-sm text-white/75 mb-5">
             <IconeLocal />
-            Trentino-Alto Adige, Itália
+            {t.local}
           </p>
 
           <div className="flex items-center gap-4 text-white/85">
@@ -88,14 +124,14 @@ export default function Footer() {
             <a href={TIKTOK} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="hover:text-white transition-colors">
               <IconeTiktok />
             </a>
-            <Link to="/contato" aria-label="Enviar e-mail" className="hover:text-white transition-colors">
+            <Link to="/contato" aria-label={t.email} className="hover:text-white transition-colors">
               <IconeEmail />
             </Link>
           </div>
         </div>
 
         {/* Colunas de navegação */}
-        {COLUNAS.map((col) => (
+        {t.colunas.map((col) => (
           <div key={col.titulo} className="lg:justify-self-center">
             <p className="text-xs font-medium tracking-[0.08em] uppercase text-white mb-4">{col.titulo}</p>
             <ul className="space-y-2.5">
@@ -113,10 +149,10 @@ export default function Footer() {
 
       <div className="border-t border-white/10">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-5 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-white/50">
-          <p>© 2026 Verditalia. Todos os direitos reservados.</p>
+          <p>© 2026 Verditalia. {t.direitos}</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white/80">Política de Privacidade</a>
-            <a href="#" className="hover:text-white/80">Termos de Uso</a>
+            <a href="#" className="hover:text-white/80">{t.privacidade}</a>
+            <a href="#" className="hover:text-white/80">{t.termos}</a>
           </div>
         </div>
       </div>

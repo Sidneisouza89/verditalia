@@ -1,11 +1,48 @@
 import { Link } from 'react-router-dom';
+import { useText } from '../i18n/LanguageContext';
 
-const BENEFICIOS = [
-  'Roteiro personalizado',
-  'Suporte antes e durante a viagem',
-  'Economia de tempo e dinheiro',
-  'Experiências reais e exclusivas',
-];
+const TEXT = {
+  pt: {
+    planEyebrow: 'Planejamento personalizado',
+    planTitulo: 'Sua viagem, do seu jeito.',
+    planCorpo: 'Criamos roteiros sob medida com base no seu perfil, tempo disponível, interesses e orçamento.',
+    beneficios: [
+      'Roteiro personalizado',
+      'Suporte antes e durante a viagem',
+      'Economia de tempo e dinheiro',
+      'Experiências reais e exclusivas',
+    ],
+    planCta: 'Agendar consultoria',
+    planAlt: 'Mesa de planejamento de viagem com mapa e caneca Verditalia',
+    ytEyebrow: 'Conteúdo em campo',
+    ytTitulo: 'Inspiração para a sua próxima viagem.',
+    ytCorpo: 'Vídeos semanais com roteiros, trilhas, dicas e muito mais sobre a Itália.',
+    ytCta: 'Assistir último vídeo',
+    ytCanal: 'Explorar canal no YouTube',
+    ytSelo: 'Último vídeo',
+    ytAlt: 'Último vídeo do canal Verditalia',
+  },
+  en: {
+    planEyebrow: 'Personalized planning',
+    planTitulo: 'Your trip, your way.',
+    planCorpo: 'We create tailor-made itineraries based on your profile, available time, interests and budget.',
+    beneficios: [
+      'Personalized itinerary',
+      'Support before and during your trip',
+      'Save time and money',
+      'Real, exclusive experiences',
+    ],
+    planCta: 'Book a consultation',
+    planAlt: 'Travel planning table with a map and a Verditalia mug',
+    ytEyebrow: 'From the field',
+    ytTitulo: 'Inspiration for your next trip.',
+    ytCorpo: 'Weekly videos with itineraries, trails, tips and much more about Italy.',
+    ytCta: 'Watch the latest video',
+    ytCanal: 'Explore our YouTube channel',
+    ytSelo: 'Latest video',
+    ytAlt: 'Latest video from the Verditalia channel',
+  },
+};
 
 // Último vídeo do canal. Para trocar, basta mudar o ID e o título
 // (no futuro isso vem do CMS).
@@ -14,13 +51,6 @@ const VIDEO = {
   titulo: 'Assis, Úmbria',
 };
 const VIDEO_URL = `https://youtu.be/${VIDEO.id}`;
-
-// Esmaece só a borda esquerda da foto (lado do texto), dissolvendo no fundo.
-// O lado direito fica sólido, sem efeito.
-const fadeLeft = {
-  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 35%)',
-  maskImage: 'linear-gradient(to right, transparent 0%, black 35%)',
-};
 
 // Tipografia compartilhada pelos dois blocos (mesma da referência)
 const eyebrow = 'text-[11px] md:text-xs tracking-[0.08em] uppercase text-forest-600 font-medium mb-3';
@@ -46,19 +76,18 @@ function Check() {
 }
 
 export default function PlanejamentoConteudo() {
+  const t = useText(TEXT);
   return (
     <section id="planejamento" className="bg-cream-200">
       <div className="grid lg:grid-cols-2">
         {/* Planejamento / Consultoria */}
         <div className="grid md:grid-cols-[1.2fr_1fr] items-stretch gap-0 md:gap-6 px-6 md:pr-0 lg:pl-10 border-b lg:border-b-0 lg:border-r border-forest-900/10">
           <div className="py-8">
-            <p className={eyebrow}>Planejamento personalizado</p>
-            <h3 className={titulo}>Sua viagem, do seu jeito.</h3>
-            <p className={corpo}>
-              Criamos roteiros sob medida com base no seu perfil, tempo disponível, interesses e orçamento.
-            </p>
+            <p className={eyebrow}>{t.planEyebrow}</p>
+            <h3 className={titulo}>{t.planTitulo}</h3>
+            <p className={corpo}>{t.planCorpo}</p>
             <ul className="space-y-2.5 mb-7">
-              {BENEFICIOS.map((b) => (
+              {t.beneficios.map((b) => (
                 <li key={b} className="flex items-center gap-2.5 text-sm text-forest-900">
                   <Check />
                   {b}
@@ -69,32 +98,30 @@ export default function PlanejamentoConteudo() {
               to="/agendar"
               className="inline-flex items-center gap-3 bg-forest-600 hover:bg-forest-500 transition-colors text-white text-sm font-medium px-5 py-3 rounded-md"
             >
-              Agendar consultoria <Seta />
+              {t.planCta} <Seta />
             </Link>
           </div>
           <img
             src="https://images.unsplash.com/photo-1499591934245-40b55745b905?auto=format&fit=crop&w=900&q=80"
-            alt="Mesa de planejamento de viagem com mapa e caneca Verditalia"
-            className="h-56 md:h-full w-full object-cover"
-            style={fadeLeft}
+            alt={t.planAlt}
+            className="h-56 md:h-full w-full object-cover rounded-xl md:rounded-none mb-8 md:mb-0 md-fade-left"
+            style={{ '--fade': '35%' }}
           />
         </div>
 
         {/* YouTube */}
         <div id="youtube" className="grid md:grid-cols-[1.1fr_1fr] items-center gap-6 px-6 lg:px-10 py-8">
           <div>
-            <p className={eyebrow}>Conteúdo em campo</p>
-            <h3 className={titulo}>Inspiração para a sua próxima viagem.</h3>
-            <p className={corpo}>
-              Vídeos semanais com roteiros, trilhas, dicas e muito mais sobre a Itália.
-            </p>
+            <p className={eyebrow}>{t.ytEyebrow}</p>
+            <h3 className={titulo}>{t.ytTitulo}</h3>
+            <p className={corpo}>{t.ytCorpo}</p>
             <a
               href={VIDEO_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 bg-forest-600 hover:bg-forest-500 transition-colors text-white text-sm font-medium px-5 py-3 rounded-md mb-7"
             >
-              Assistir último vídeo
+              {t.ytCta}
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                 <path d="M7 4.5v15l12-7.5-12-7.5z" strokeLinejoin="round" />
               </svg>
@@ -106,7 +133,7 @@ export default function PlanejamentoConteudo() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-forest-900 hover:text-forest-600 transition-colors"
               >
-                Explorar canal no YouTube <Seta />
+                {t.ytCanal} <Seta />
               </a>
             </div>
           </div>
@@ -127,13 +154,13 @@ export default function PlanejamentoConteudo() {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = `https://img.youtube.com/vi/${VIDEO.id}/hqdefault.jpg`;
               }}
-              alt={`Último vídeo do canal Verditalia: ${VIDEO.titulo}`}
+              alt={`${t.ytAlt}: ${VIDEO.titulo}`}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             {/* escurece só a base, para o título ficar legível */}
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/65 to-transparent" />
             <span className="absolute top-3 left-3 bg-forest-700/90 text-white text-[10px] font-medium px-2.5 py-1 rounded-md">
-              Último vídeo
+              {t.ytSelo}
             </span>
             <span className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-black/55 group-hover:bg-black/70 transition-colors flex items-center justify-center">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white" aria-hidden="true">

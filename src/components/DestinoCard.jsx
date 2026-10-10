@@ -1,6 +1,14 @@
+import { useText } from '../i18n/LanguageContext';
+
+const TEXT = {
+  pt: { emBreve: 'Em breve', emProducao: 'Guia em produção', conhecer: 'Conhecer guia' },
+  en: { emBreve: 'Coming soon', emProducao: 'Guide in progress', conhecer: 'View guide' },
+};
+
 export default function DestinoCard({ icon, image, title, description, stats, checkoutUrl, comingSoon }) {
+  const t = useText(TEXT);
   return (
-    <div className="relative rounded-2xl overflow-hidden h-[420px] group">
+    <div className="relative rounded-2xl overflow-hidden h-[340px] md:h-[420px] group">
       <img
         src={image}
         alt={title}
@@ -14,7 +22,7 @@ export default function DestinoCard({ icon, image, title, description, stats, ch
 
       {comingSoon && (
         <span className="absolute top-5 right-5 bg-cream-100 text-forest-900 text-[11px] font-medium px-3 py-1.5 rounded-full">
-          Em breve
+          {t.emBreve}
         </span>
       )}
 
@@ -32,7 +40,7 @@ export default function DestinoCard({ icon, image, title, description, stats, ch
 
         {comingSoon ? (
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-white/60">
-            Guia em produção
+            {t.emProducao}
           </span>
         ) : (
           <a
@@ -41,7 +49,7 @@ export default function DestinoCard({ icon, image, title, description, stats, ch
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
           >
-            Conhecer guia <span aria-hidden>→</span>
+            {t.conhecer} <span aria-hidden>→</span>
           </a>
         )}
       </div>

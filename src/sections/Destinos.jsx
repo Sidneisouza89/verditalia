@@ -1,13 +1,12 @@
 import DestinoCard from '../components/DestinoCard';
+import { useText } from '../i18n/LanguageContext';
 
 // Ordem visual = prioridade de autoridade regional (definida pela Lídice).
 // Dolomitas ainda não tem checkout pronto -> exibido como "em breve".
 const DESTINOS = [
   {
-    title: 'DOLOMITAS',
-    description: 'Montanhas incríveis, trilhas, lagos e vilarejos encantadores.',
+    slug: 'dolomitas',
     image: 'https://images.unsplash.com/photo-1694630515448-344264b30507?auto=format&fit=crop&w=900&q=80',
-    stats: ['🏔 35 trilhas', '🏞 17 lagos', '📍 4 roteiros'],
     comingSoon: true,
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -16,10 +15,8 @@ const DESTINOS = [
     ),
   },
   {
-    title: 'UMBRIA',
-    description: 'Vilarejos medievais, natureza e sabores autênticos.',
+    slug: 'umbria',
     image: 'https://images.unsplash.com/photo-1660416589770-45975532a608?auto=format&fit=crop&w=900&q=80',
-    stats: ['🏘 15 vilarejos', '🥾 8 roteiros', '✨ Experiências'],
     checkoutUrl: 'https://go.hotmart.com/J100566519N',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -28,10 +25,8 @@ const DESTINOS = [
     ),
   },
   {
-    title: 'ROMA',
-    description: 'História, cultura e gastronomia em uma cidade eterna.',
+    slug: 'roma',
     image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=900&q=80',
-    stats: ['🏛 20 atrações', '🍝 6 roteiros', '💡 Dicas práticas'],
     checkoutUrl: 'https://go.hotmart.com/N103493622Q',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -41,21 +36,67 @@ const DESTINOS = [
   },
 ];
 
+const TEXT = {
+  pt: {
+    eyebrow: 'NOSSOS GUIAS AUTORAIS',
+    titulo: 'Guias completos para você explorar o melhor da Itália.',
+    guias: {
+      dolomitas: {
+        title: 'DOLOMITAS',
+        description: 'Montanhas incríveis, trilhas, lagos e vilarejos encantadores.',
+        stats: ['🏔 35 trilhas', '🏞 17 lagos', '📍 4 roteiros'],
+      },
+      umbria: {
+        title: 'UMBRIA',
+        description: 'Vilarejos medievais, natureza e sabores autênticos.',
+        stats: ['🏘 15 vilarejos', '🥾 8 roteiros', '✨ Experiências'],
+      },
+      roma: {
+        title: 'ROMA',
+        description: 'História, cultura e gastronomia em uma cidade eterna.',
+        stats: ['🏛 20 atrações', '🍝 6 roteiros', '💡 Dicas práticas'],
+      },
+    },
+  },
+  en: {
+    eyebrow: 'OUR ORIGINAL GUIDES',
+    titulo: 'Complete guides to explore the best of Italy.',
+    guias: {
+      dolomitas: {
+        title: 'DOLOMITES',
+        description: 'Stunning mountains, trails, lakes and charming villages.',
+        stats: ['🏔 35 trails', '🏞 17 lakes', '📍 4 itineraries'],
+      },
+      umbria: {
+        title: 'UMBRIA',
+        description: 'Medieval villages, nature and authentic flavors.',
+        stats: ['🏘 15 villages', '🥾 8 itineraries', '✨ Experiences'],
+      },
+      roma: {
+        title: 'ROME',
+        description: 'History, culture and food in the eternal city.',
+        stats: ['🏛 20 attractions', '🍝 6 itineraries', '💡 Practical tips'],
+      },
+    },
+  },
+};
+
 export default function Destinos() {
+  const t = useText(TEXT);
   return (
     <section id="guias" className="max-w-[1800px] mx-auto px-4 lg:px-6 pt-10 md:pt-14 pb-8 md:pb-10">
       <div className="text-center mb-10">
         <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
-          NOSSOS GUIAS AUTORAIS
+          {t.eyebrow}
         </p>
         <h2 className="font-display text-3xl md:text-4xl text-forest-900">
-          Guias completos para você explorar o melhor da Itália.
+          {t.titulo}
         </h2>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
         {DESTINOS.map((d) => (
-          <DestinoCard key={d.title} {...d} />
+          <DestinoCard key={d.slug} {...d} {...t.guias[d.slug]} />
         ))}
       </div>
     </section>

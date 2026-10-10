@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useText } from '../i18n/LanguageContext';
 
 // Ícones em traço fino, mesma linguagem visual da referência
 const IconePin = () => (
@@ -20,40 +21,58 @@ const IconeBussola = () => (
   </svg>
 );
 
-const DIFERENCIAIS = [
-  { title: 'Conhecimento local', desc: 'Informações que só quem vive aqui conhece.', Icon: IconePin },
-  { title: 'Experiências reais', desc: 'Testamos cada roteiro, trilha e hospedagem.', Icon: IconeMontanha },
-  { title: 'Conteúdo confiável', desc: 'Dicas práticas, honestas e sempre atualizadas.', Icon: IconeBussola },
-];
+const ICONES = [IconePin, IconeMontanha, IconeBussola];
 
-// Degradê largo só na borda esquerda da foto, dissolvendo no fundo creme
-const fadeLeft = {
-  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 28%)',
-  maskImage: 'linear-gradient(to right, transparent 0%, black 28%)',
+const TEXT = {
+  pt: {
+    eyebrow: 'Nossa casa',
+    titulo: 'Trentino-Alto Adige, onde tudo começa.',
+    corpo:
+      'Vivemos aqui. Exploramos cada canto desta região durante todas as estações para trazer informações confiáveis, atualizadas e experiências que vão muito além do óbvio.',
+    cta: 'Conhecer a região',
+    diferenciais: [
+      { title: 'Conhecimento local', desc: 'Informações que só quem vive aqui conhece.' },
+      { title: 'Experiências reais', desc: 'Testamos cada roteiro, trilha e hospedagem.' },
+      { title: 'Conteúdo confiável', desc: 'Dicas práticas, honestas e sempre atualizadas.' },
+    ],
+    alt: 'Vilarejo nos Alpes Italianos',
+    cardTexto: 'Nossa casa nos Alpes Italianos.',
+  },
+  en: {
+    eyebrow: 'Our home',
+    titulo: 'Trentino-Alto Adige, where it all begins.',
+    corpo:
+      'We live here. We explore every corner of this region in every season to bring you reliable, up-to-date information and experiences that go far beyond the obvious.',
+    cta: 'Discover the region',
+    diferenciais: [
+      { title: 'Local knowledge', desc: 'Insights only people who live here know.' },
+      { title: 'Real experiences', desc: 'We test every itinerary, trail and stay.' },
+      { title: 'Trusted content', desc: 'Practical, honest and always up-to-date tips.' },
+    ],
+    alt: 'Village in the Italian Alps',
+    cardTexto: 'Our home in the Italian Alps.',
+  },
 };
 
 export default function NossaCasa() {
+  const t = useText(TEXT);
   return (
     <section id="nossa-casa" className="bg-cream-100 grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
       {/* Texto + diferenciais */}
       <div className="grid md:grid-cols-[1.45fr_1fr] items-center gap-8 md:gap-0 px-6 lg:pl-10 lg:pr-4 py-10 md:py-14">
         <div className="md:pr-8 md:border-r border-forest-900/15">
           <p className="text-[11px] md:text-xs tracking-[0.08em] uppercase text-forest-600 font-medium mb-3">
-            Nossa casa
+            {t.eyebrow}
           </p>
           <h2 className="font-display font-normal text-[1.75rem] md:text-[2rem] leading-[1.15] text-forest-900 mb-3">
-            Trentino-Alto Adige, onde tudo começa.
+            {t.titulo}
           </h2>
-          <p className="text-stone-700 text-sm leading-relaxed mb-6">
-            Vivemos aqui. Exploramos cada canto desta região durante todas as estações
-            para trazer informações confiáveis, atualizadas e experiências que vão muito
-            além do óbvio.
-          </p>
+          <p className="text-stone-700 text-sm leading-relaxed mb-6">{t.corpo}</p>
           <Link
             to="/sobre"
             className="inline-flex items-center gap-2 text-sm text-forest-900 hover:text-forest-600 transition-colors"
           >
-            Conhecer a região
+            {t.cta}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -61,7 +80,9 @@ export default function NossaCasa() {
         </div>
 
         <ul className="flex flex-col gap-6 md:pl-8">
-          {DIFERENCIAIS.map(({ title, desc, Icon }) => (
+          {t.diferenciais.map(({ title, desc }, i) => {
+            const Icon = ICONES[i];
+            return (
             <li key={title} className="flex items-start gap-3.5">
               <span className="text-forest-700 shrink-0 mt-0.5">
                 <Icon />
@@ -71,7 +92,8 @@ export default function NossaCasa() {
                 <p className="text-[13px] text-stone-700 leading-snug mt-1">{desc}</p>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
 
@@ -79,9 +101,9 @@ export default function NossaCasa() {
       <div className="relative min-h-[300px] lg:min-h-0">
         <img
           src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1600&q=80"
-          alt="Vilarejo nos Alpes Italianos"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={fadeLeft}
+          alt={t.alt}
+          className="absolute inset-0 w-full h-full object-cover md-fade-left"
+          style={{ '--fade': '28%' }}
         />
         <div className="absolute bottom-5 right-5 lg:right-8 w-40 bg-forest-800/95 border border-white/60 text-white rounded-xl px-4 py-5 text-center">
           {/* Espaço reservado para o desenho do mapa da Itália (a "bota") com a marcação da região */}
@@ -94,7 +116,7 @@ export default function NossaCasa() {
           <p className="text-xs font-medium tracking-wide uppercase leading-tight mb-1.5">
             Trentino-Alto Adige
           </p>
-          <p className="text-[11px] text-white/80 leading-snug">Nossa casa nos Alpes Italianos.</p>
+          <p className="text-[11px] text-white/80 leading-snug">{t.cardTexto}</p>
         </div>
       </div>
     </section>
