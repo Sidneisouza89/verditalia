@@ -11,7 +11,7 @@ import { useText } from '../i18n/LanguageContext';
 */
 
 const ROME_SLOTS = ['13:00', '14:30', '16:00', '17:30', '19:00']; // tarde na Itália = manhã no Brasil
-const MONTHS_AHEAD = 2;
+const MONTHS_AHEAD = 5; // mês atual + 5 = 6 meses de agenda
 const MIN_NOTICE_DAYS = 2;
 const DURATION_MIN = 60;
 
@@ -103,8 +103,12 @@ const SEASON_ICONS = {
   ),
   primavera: (
     <Svg>
-      <circle cx="12" cy="12" r="2.5" />
-      <path d="M12 9.5C10 6 10.5 3.5 12 3c1.5.5 2 3 0 6.5zM12 14.5c2 3.5 1.5 6 0 6.5-1.5-.5-2-3 0-6.5zM9.5 12C6 14 3.5 13.5 3 12c.5-1.5 3-2 6.5 0zM14.5 12c3.5-2 6-1.5 6.5 0-.5 1.5-3 2-6.5 0z" />
+      <circle cx="12" cy="6.8" r="3" />
+      <circle cx="17" cy="10.4" r="3" />
+      <circle cx="15.1" cy="16.3" r="3" />
+      <circle cx="8.9" cy="16.3" r="3" />
+      <circle cx="7" cy="10.4" r="3" />
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" />
     </Svg>
   ),
   verao: (
@@ -318,7 +322,8 @@ export default function BookingWidget() {
               >
                 {SEASON_ICONS[sk]}
                 {cap(fmt.tab.format(m).replace('.', ''))}
-                {m.getFullYear() !== today.getFullYear() ? ` ${m.getFullYear()}` : ''}
+                {/* ano só na virada (janeiro), para não repetir em todos */}
+                {m.getMonth() === 0 && m.getFullYear() !== today.getFullYear() ? ` ${m.getFullYear()}` : ''}
               </button>
             );
           })}
