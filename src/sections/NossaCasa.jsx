@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useText } from '../i18n/LanguageContext';
+import ItaliaMapa from '../components/ItaliaMapa';
 
 // Ícones em traço fino, mesma linguagem visual da referência
 const IconePin = () => (
@@ -37,6 +38,7 @@ const TEXT = {
     ],
     alt: 'Vilarejo nos Alpes Italianos',
     cardTexto: 'Nossa casa nos Alpes Italianos.',
+    mapaAlt: 'Mapa da Itália com o Trentino-Alto Adige em destaque',
   },
   en: {
     eyebrow: 'Our home',
@@ -51,6 +53,7 @@ const TEXT = {
     ],
     alt: 'Village in the Italian Alps',
     cardTexto: 'Our home in the Italian Alps.',
+    mapaAlt: 'Map of Italy highlighting Trentino-Alto Adige',
   },
 };
 
@@ -106,12 +109,9 @@ export default function NossaCasa() {
           style={{ '--fade': '28%' }}
         />
         <div className="absolute bottom-5 right-5 lg:right-8 w-40 bg-forest-800/95 border border-white/60 text-white rounded-xl px-4 py-5 text-center">
-          {/* Espaço reservado para o desenho do mapa da Itália (a "bota") com a marcação da região */}
-          <div className="h-16 mb-3 flex items-center justify-center text-white/80">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden="true">
-              <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" strokeLinejoin="round" />
-              <circle cx="12" cy="10" r="2.3" />
-            </svg>
+          {/* Mapa da Itália ("bota") com a marcação do Trentino-Alto Adige */}
+          <div className="mb-3 flex items-center justify-center text-white/90">
+            <ItaliaMapa className="h-[88px] w-auto" titulo={t.mapaAlt} />
           </div>
           <p className="text-xs font-medium tracking-wide uppercase leading-tight mb-1.5">
             Trentino-Alto Adige
