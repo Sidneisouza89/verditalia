@@ -6,7 +6,7 @@ const TEXT = {
   pt: {
     eyebrow: 'CONTATO',
     titulo: 'Fale com a gente.',
-    intro: 'Envie sua mensagem — respondemos direto no seu e-mail, sem intermediários.',
+    intro: 'Envie sua mensagem — responderemos direto no seu e-mail.',
     nome: 'Seu nome',
     email: 'Seu e-mail',
     mensagem: 'Mensagem',
@@ -22,7 +22,7 @@ const TEXT = {
   en: {
     eyebrow: 'CONTACT',
     titulo: 'Get in touch.',
-    intro: 'Send us a message — we reply straight to your inbox, no middlemen.',
+    intro: "Send us a message — we'll reply straight to your inbox.",
     nome: 'Your name',
     email: 'Your email',
     mensagem: 'Message',
@@ -86,7 +86,7 @@ export default function Contato() {
   }
 
   return (
-    <section id="contato" className="max-w-[700px] mx-auto px-6 lg:px-10 py-14 md:py-24 text-center">
+    <section id="contato" className="max-w-[700px] mx-auto px-6 lg:px-10 pt-6 md:pt-8 pb-14 md:pb-24 text-center">
       <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">{t.eyebrow}</p>
       <h2 className="font-display text-3xl md:text-4xl text-forest-900 mb-4">{t.titulo}</h2>
       <p className="text-stone-700 text-sm mb-10 max-w-md mx-auto">{t.intro}</p>
