@@ -30,13 +30,17 @@ export default function DestinoCard({ icon, image, title, description, stats, ch
         <h3 className="font-display text-2xl mb-2 tracking-wide">{title}</h3>
         <p className="text-white/85 text-sm leading-relaxed mb-4">{description}</p>
 
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/75 mb-4 pb-4 border-b border-white/15">
-          {stats.map((s) => (
-            <span key={s} className="flex items-center gap-1">
-              {s}
-            </span>
-          ))}
-        </div>
+        {stats?.length ? (
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/75 mb-4 pb-4 border-b border-white/15">
+            {stats.map((s) => (
+              <span key={s} className="flex items-center gap-1">
+                {s}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <div className="mb-4 border-b border-white/15" />
+        )}
 
         {comingSoon ? (
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-white/60">

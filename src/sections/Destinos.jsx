@@ -44,7 +44,7 @@ const TEXT = {
       dolomitas: {
         title: 'DOLOMITAS',
         description: 'Montanhas incríveis, trilhas, lagos e vilarejos encantadores.',
-        stats: ['🏔 35 trilhas', '🏞 17 lagos', '📍 4 roteiros'],
+        stats: [], // destaques reais entram quando o guia estiver pronto
       },
       umbria: {
         title: 'UMBRIA',
@@ -65,7 +65,7 @@ const TEXT = {
       dolomitas: {
         title: 'DOLOMITES',
         description: 'Stunning mountains, trails, lakes and charming villages.',
-        stats: ['🏔 35 trails', '🏞 17 lakes', '📍 4 itineraries'],
+        stats: [],
       },
       umbria: {
         title: 'UMBRIA',

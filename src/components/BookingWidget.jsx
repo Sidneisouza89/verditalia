@@ -25,7 +25,6 @@ const TEXT = {
     duracao: `${DURATION_MIN} minutos`,
     formato: 'Videochamada (link enviado após o pagamento)',
     regiao: 'Trentino-Alto Adige, Dolomitas e roteiros pela Itália',
-    entrega: 'Roteiro personalizado enviado depois da conversa',
     detalhesTitulo: 'Detalhes do serviço',
     detalhes:
       'Planejamento de viagem personalizado com especialistas locais no Trentino-Alto Adige e nas Dolomitas, pensado para quem deseja descobrir o território de forma autêntica, com roteiros cuidadosamente planejados e experiências alinhadas ao seu perfil de viagem.',
@@ -68,7 +67,6 @@ const TEXT = {
     duracao: `${DURATION_MIN} minutes`,
     formato: 'Video call (link sent after payment)',
     regiao: 'Trentino-Alto Adige, the Dolomites and trips across Italy',
-    entrega: 'Personalized itinerary sent after the call',
     detalhesTitulo: 'Service details',
     detalhes:
       'Personalized trip planning with local experts in Trentino-Alto Adige and the Dolomites, for travelers who want to discover the region authentically, with carefully planned itineraries and experiences tailored to their travel style.',
@@ -325,10 +323,6 @@ export default function BookingWidget() {
           <li className={fact}>
             <span className="text-forest-600 mt-0.5"><Svg size={16}><path d="M2.5 19.5L9 8l4 7 2.5-4 6 8.5h-19z" /></Svg></span>
             {t.regiao}
-          </li>
-          <li className={fact}>
-            <span className="text-forest-600 mt-0.5"><Svg size={16}><path d="M5 12.5l4.5 4.5L19 7.5" /></Svg></span>
-            {t.entrega}
           </li>
         </ul>
         <div className="border-t border-forest-900/10 pt-4 flex justify-between items-baseline gap-2">
