@@ -49,12 +49,12 @@ const TEXT = {
       umbria: {
         title: 'UMBRIA',
         description: 'Vilarejos medievais, natureza e sabores autênticos.',
-        stats: ['🏘 15 vilarejos', '🥾 8 roteiros', '✨ Experiências'],
+        stats: ['🗺 200 destinos com mapa vitalício', '🏘 Guia das 10 principais cidades', '🥾 Roteiros de 1, 3 e 5 dias'],
       },
       roma: {
         title: 'ROMA',
         description: 'História, cultura e gastronomia em uma cidade eterna.',
-        stats: ['🏛 20 atrações', '🍝 6 roteiros', '💡 Dicas práticas'],
+        stats: ['👨‍👩‍👧 Dicas para famílias e acessibilidade', '🗺 200 destinos com mapa vitalício', '🥾 Roteiros de 1, 3 e 5 dias'],
       },
     },
   },
@@ -70,12 +70,12 @@ const TEXT = {
       umbria: {
         title: 'UMBRIA',
         description: 'Medieval villages, nature and authentic flavors.',
-        stats: ['🏘 15 villages', '🥾 8 itineraries', '✨ Experiences'],
+        stats: ['🗺 200 places with a lifetime map', '🏘 Guide to the 10 main towns', '🥾 1, 3 and 5-day itineraries'],
       },
       roma: {
         title: 'ROME',
         description: 'History, culture and food in the eternal city.',
-        stats: ['🏛 20 attractions', '🍝 6 itineraries', '💡 Practical tips'],
+        stats: ['👨‍👩‍👧 Tips for families and accessibility', '🗺 200 places with a lifetime map', '🥾 1, 3 and 5-day itineraries'],
       },
     },
   },

@@ -41,8 +41,8 @@ export default function Header({ solid = false }) {
 
   const links = [
     { label: t.sobre, to: '/sobre' },
-    { label: 'YouTube', href: 'https://www.youtube.com/@verditalia', external: true },
     { label: t.contato, to: '/contato' },
+    { label: 'YouTube', href: 'https://www.youtube.com/@verditalia', external: true },
   ];
 
   const renderLink = (link, className) =>

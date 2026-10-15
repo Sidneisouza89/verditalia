@@ -31,8 +31,8 @@ const TEXT = {
       'Vivemos aqui. Exploramos cada canto desta região durante todas as estações para trazer informações confiáveis, atualizadas e experiências que vão muito além do óbvio.',
     cta: 'Conhecer a região',
     diferenciais: [
-      { title: 'Conhecimento local', desc: 'Informações que só quem vive aqui conhece.' },
-      { title: 'Experiências reais', desc: 'Testamos cada roteiro, trilha e hospedagem.' },
+      { title: 'Especialistas no território', desc: 'Informações que só quem vive aqui conhece.' },
+      { title: 'Experiências autênticas', desc: 'Em vilarejos, produtores locais e tradições.' },
       { title: 'Conteúdo confiável', desc: 'Dicas práticas, honestas e sempre atualizadas.' },
     ],
     alt: 'Vilarejo nos Alpes Italianos',
@@ -45,8 +45,8 @@ const TEXT = {
       'We live here. We explore every corner of this region in every season to bring you reliable, up-to-date information and experiences that go far beyond the obvious.',
     cta: 'Discover the region',
     diferenciais: [
-      { title: 'Local knowledge', desc: 'Insights only people who live here know.' },
-      { title: 'Real experiences', desc: 'We test every itinerary, trail and stay.' },
+      { title: 'Experts on the ground', desc: 'Insights only people who live here know.' },
+      { title: 'Authentic experiences', desc: 'In villages, with local producers and traditions.' },
       { title: 'Trusted content', desc: 'Practical, honest and always up-to-date tips.' },
     ],
     alt: 'Village in the Italian Alps',

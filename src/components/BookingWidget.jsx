@@ -26,6 +26,9 @@ const TEXT = {
     formato: 'Videochamada (link enviado após o pagamento)',
     regiao: 'Trentino-Alto Adige, Dolomitas e roteiros pela Itália',
     entrega: 'Roteiro personalizado enviado depois da conversa',
+    detalhesTitulo: 'Detalhes do serviço',
+    detalhes:
+      'Planejamento de viagem personalizado com especialistas locais no Trentino-Alto Adige e nas Dolomitas, pensado para quem deseja descobrir o território de forma autêntica, com roteiros cuidadosamente planejados e experiências alinhadas ao seu perfil de viagem.',
     valor: 'Valor da consultoria',
     valorNota: 'Valor a definir. Pagamento seguro via Stripe.',
     dow: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
@@ -66,6 +69,9 @@ const TEXT = {
     formato: 'Video call (link sent after payment)',
     regiao: 'Trentino-Alto Adige, the Dolomites and trips across Italy',
     entrega: 'Personalized itinerary sent after the call',
+    detalhesTitulo: 'Service details',
+    detalhes:
+      'Personalized trip planning with local experts in Trentino-Alto Adige and the Dolomites, for travelers who want to discover the region authentically, with carefully planned itineraries and experiences tailored to their travel style.',
     valor: 'Consultation fee',
     valorNota: 'Fee to be confirmed. Secure payment via Stripe.',
     dow: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -297,7 +303,16 @@ export default function BookingWidget() {
             <p className="text-sm font-medium">Lídice · Verditalia</p>
           </div>
         </div>
-        <h2 className="font-display text-[22px] leading-tight text-forest-900 mb-4">{t.titulo}</h2>
+        <h2 className="font-display text-[22px] leading-tight text-forest-900 mb-3">{t.titulo}</h2>
+        <details className="group mb-4 text-[13px] text-stone-700">
+          <summary className="cursor-pointer list-none inline-flex items-center gap-1.5 text-forest-700 font-medium [&::-webkit-details-marker]:hidden">
+            {t.detalhesTitulo}
+            <span className="transition-transform group-open:rotate-180" aria-hidden="true">
+              <Svg size={14} strokeWidth={1.8}><path d="M6 9l6 6 6-6" /></Svg>
+            </span>
+          </summary>
+          <p className="mt-2 leading-relaxed">{t.detalhes}</p>
+        </details>
         <ul className="grid gap-2.5 mb-5">
           <li className={fact}>
             <span className="text-forest-600 mt-0.5"><Svg size={16}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Svg></span>
