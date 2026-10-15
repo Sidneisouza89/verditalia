@@ -15,7 +15,7 @@ import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { AGENDA, disponibilidade, googleConfigurado, validarMes } from './agenda.js';
+import { AGENDA, TIPO_PADRAO, disponibilidade, googleConfigurado, validarMes, validarTipo } from './agenda.js';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), 'dist');
 const PORT = Number(process.env.PORT) || 3000;
@@ -167,15 +167,17 @@ async function handleContato(req, res) {
   }
 }
 
-// ---------- GET /api/disponibilidade?mes=AAAA-MM ----------
+// ---------- GET /api/disponibilidade?mes=AAAA-MM&tipo=express|completa|ti ----------
 
 async function handleDisponibilidade(res, searchParams) {
   const mes = validarMes(searchParams.get('mes'));
   if (!mes) {
     return sendJson(res, 400, { ok: false, error: `Mês inválido ou fora da janela de ${AGENDA.mesesAFrente + 1} meses.` });
   }
+  const tipo = searchParams.has('tipo') ? validarTipo(searchParams.get('tipo')) : TIPO_PADRAO;
+  if (!tipo) return sendJson(res, 400, { ok: false, error: 'Tipo de consultoria inválido.' });
   try {
-    const dados = await disponibilidade(mes);
+    const dados = await disponibilidade(mes, tipo);
     res.setHeader('Cache-Control', 'no-store');
     return sendJson(res, 200, { ok: true, ...dados });
   } catch (err) {

@@ -58,7 +58,8 @@ const TEXT = {
       {
         titulo: 'Planejamento',
         links: [
-          { label: 'Consultoria personalizada', to: '/agendar' },
+          { label: 'Consultoria de viagem', to: '/agendar' },
+          { label: 'Consultoria de TI', to: '/agendar?tipo=ti' },
           { label: 'Fale conosco', to: '/contato' },
         ],
       },
@@ -85,7 +86,8 @@ const TEXT = {
       {
         titulo: 'Planning',
         links: [
-          { label: 'Personalized consultation', to: '/agendar' },
+          { label: 'Travel consultation', to: '/agendar' },
+          { label: 'IT consultation', to: '/agendar?tipo=ti' },
           { label: 'Contact us', to: '/contato' },
         ],
       },

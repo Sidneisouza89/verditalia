@@ -6,32 +6,32 @@ import { useText } from '../i18n/LanguageContext';
 
 const TEXT = {
   pt: {
-    eyebrow: 'CONSULTORIA PERSONALIZADA',
-    titulo: 'Agende sua consultoria de viagem.',
+    eyebrow: 'CONSULTORIAS',
+    titulo: 'Agende sua consultoria.',
     intro:
       'Escolha o dia e o horário que funcionam para você. A vaga só fica reservada depois da confirmação do pagamento, e você recebe o link da videochamada por e-mail.',
     introPedido:
-      'Escolha o dia e o horário que funcionam para você e envie o pedido. Respondemos por e-mail para confirmar a reserva, e você recebe o link da videochamada.',
+      'Escolha o tipo de consultoria, o dia e o horário que funcionam para você e envie o pedido. Respondemos por e-mail para confirmar o horário e o valor, e você recebe o link da videochamada.',
     passos: [
       ['Escolha dia e horário', 'Só aparecem horários livres na agenda da Verditalia.'],
       ['Pague com segurança', 'A reserva é confirmada assim que o pagamento é aprovado.'],
       ['Receba o link', 'O convite da videochamada chega no seu e-mail.'],
     ],
-    passoPedido: ['Confirmação por e-mail', 'Respondemos seu pedido confirmando o horário e o pagamento.'],
+    passoPedido: ['Confirmação por e-mail', 'Respondemos seu pedido confirmando o horário, o valor e a forma de pagamento.'],
   },
   en: {
-    eyebrow: 'PERSONALIZED CONSULTATION',
-    titulo: 'Book your travel consultation.',
+    eyebrow: 'CONSULTATIONS',
+    titulo: 'Book your consultation.',
     intro:
       'Pick the day and time that work for you. Your slot is confirmed once payment goes through, and the video call link is sent to your email.',
     introPedido:
-      'Pick the day and time that work for you and send your request. We reply by email to confirm the booking, and you get the video call link.',
+      'Choose the type of consultation, the day and the time that work for you, and send your request. We reply by email to confirm the time and fee, and you get the video call link.',
     passos: [
       ['Pick a day and time', "Only open slots in Verditalia's calendar are shown."],
       ['Pay securely', 'Your booking is confirmed as soon as payment is approved.'],
       ['Get the link', 'The video call invitation arrives in your inbox.'],
     ],
-    passoPedido: ['Email confirmation', 'We reply to your request confirming the time and payment.'],
+    passoPedido: ['Email confirmation', 'We reply confirming the time, the fee and how to pay.'],
   },
 };
 

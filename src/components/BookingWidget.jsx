@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useText } from '../i18n/LanguageContext';
 
 /*
@@ -9,27 +9,54 @@ import { useText } from '../i18n/LanguageContext';
     agenda real da Lídice no Google Calendar. As regras (dias, horários,
     duração, antecedência) ficam no servidor, em agenda.js.
   - Horários definidos no fuso da Itália e mostrados no fuso do visitante.
-  - Enquanto o pagamento (Stripe) não estiver ligado, o visitante envia o
-    pedido do horário pelo Fale conosco, já preenchido.
+  - Três tipos de consultoria (express, completa, ti), cada um com sua duração
+    (definida no servidor). Dá para abrir direto num tipo com /agendar?tipo=ti.
+  - Sem pagamento online por enquanto: o visitante envia o pedido do horário
+    pelo Fale conosco, já preenchido, e a confirmação (com valor) é por e-mail.
 */
 
 const MONTHS_AHEAD = 5; // mês atual + 5 = 6 meses de agenda (mesmo valor de AGENDA_MESES_A_FRENTE no servidor)
-const DURATION_MIN = 60; // padrão; o servidor informa a duração real
+const TIPO_IDS = ['express', 'completa', 'ti'];
+const TIPO_PADRAO = 'completa';
+const DURACAO_PADRAO = { express: 30, completa: 60, ti: 60 }; // o servidor informa a duração real
 export const PAGAMENTO_ATIVO = false; // vira true quando o Stripe estiver configurado
 
 const TEXT = {
   pt: {
     locale: 'pt-BR',
     com: 'Com',
-    titulo: 'Consultoria de viagem personalizada',
-    duracao: `${DURATION_MIN} minutos`,
-    formato: 'Videochamada (link enviado após o pagamento)',
-    regiao: 'Trentino-Alto Adige, Dolomitas e roteiros pela Itália',
+    escolhaTipo: 'Escolha o tipo de consultoria',
+    tipos: {
+      express: {
+        nome: 'Consultoria Express',
+        tag: 'Viagem',
+        resumo: 'Uma conversa objetiva para tirar dúvidas pontuais ou ajustar um roteiro que você já começou.',
+        detalhes:
+          'Para quem já tem a viagem encaminhada e quer a visão de quem vive no Trentino-Alto Adige: tirar dúvidas, validar o roteiro, os deslocamentos e as escolhas do caminho.',
+        tema: 'Trentino-Alto Adige, Dolomitas e roteiros pela Itália',
+      },
+      completa: {
+        nome: 'Consultoria Completa de Viagem',
+        tag: 'Viagem',
+        resumo: 'Planejamento personalizado do zero, pensado para o seu perfil, tempo disponível, interesses e orçamento.',
+        detalhes:
+          'Planejamento de viagem personalizado com especialistas locais no Trentino-Alto Adige e nas Dolomitas, pensado para quem deseja descobrir o território de forma autêntica, com roteiros cuidadosamente planejados e experiências alinhadas ao seu perfil de viagem.',
+        tema: 'Trentino-Alto Adige, Dolomitas e roteiros pela Itália',
+      },
+      ti: {
+        nome: 'Consultoria de TI',
+        tag: 'Tecnologia',
+        resumo: 'Para quem chegou pelos vídeos de tecnologia do canal: uma conversa com quem atua há mais de 20 anos na área.',
+        detalhes:
+          'Conversa por videochamada sobre carreira, projetos e dúvidas de tecnologia, com a experiência de mais de 20 anos na área de TI.',
+        tema: 'Carreira, projetos e tecnologia',
+      },
+    },
+    minutos: (n) => `${n} minutos`,
+    formato: 'Videochamada (link enviado na confirmação)',
     detalhesTitulo: 'Detalhes do serviço',
-    detalhes:
-      'Planejamento de viagem personalizado com especialistas locais no Trentino-Alto Adige e nas Dolomitas, pensado para quem deseja descobrir o território de forma autêntica, com roteiros cuidadosamente planejados e experiências alinhadas ao seu perfil de viagem.',
-    valor: 'Valor da consultoria',
-    valorNota: 'Valor a definir. Pagamento seguro via Stripe.',
+    valorNota: 'O valor e a forma de pagamento são combinados por e-mail, na confirmação do horário.',
+    diaSemVaga: 'Este dia não tem horário livre para este tipo de consultoria. Escolha outro dia.',
     dow: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
     mesAnterior: 'Mês anterior',
     proximoMes: 'Próximo mês',
@@ -51,8 +78,8 @@ const TEXT = {
     erroCarregar: 'Não foi possível carregar os horários agora.',
     tentarNovamente: 'Tentar novamente',
     semVagasMes: 'Sem horários livres neste mês. Veja os próximos meses.',
-    mensagemPedido: (dia, local, italia) =>
-      `Olá! Gostaria de agendar a consultoria de viagem em ${dia}, às ${local} (meu horário), ${italia} na Itália.\n\nSobre a viagem: `,
+    mensagemPedido: (tipo, dia, local, italia, ehTi) =>
+      `Olá! Gostaria de agendar a ${tipo} em ${dia}, às ${local} (meu horário), ${italia} na Itália.\n\n${ehTi ? 'Sobre o assunto' : 'Sobre a viagem'}: `,
     estacoes: {
       inverno: ['Inverno', 'Neve nas Dolomitas'],
       primavera: ['Primavera', 'Flores nos vales'],
@@ -63,15 +90,38 @@ const TEXT = {
   en: {
     locale: 'en-GB',
     com: 'With',
-    titulo: 'Personalized travel consultation',
-    duracao: `${DURATION_MIN} minutes`,
-    formato: 'Video call (link sent after payment)',
-    regiao: 'Trentino-Alto Adige, the Dolomites and trips across Italy',
+    escolhaTipo: 'Choose your consultation',
+    tipos: {
+      express: {
+        nome: 'Express Consultation',
+        tag: 'Travel',
+        resumo: 'A focused conversation to answer specific questions or fine-tune an itinerary you have already started.',
+        detalhes:
+          'For travelers whose trip is already taking shape and who want the view of someone who lives in Trentino-Alto Adige: answer questions, check the itinerary, getting around and the choices along the way.',
+        tema: 'Trentino-Alto Adige, the Dolomites and trips across Italy',
+      },
+      completa: {
+        nome: 'Full Travel Consultation',
+        tag: 'Travel',
+        resumo: 'Personalized planning from scratch, built around your profile, available time, interests and budget.',
+        detalhes:
+          'Personalized trip planning with local experts in Trentino-Alto Adige and the Dolomites, for travelers who want to discover the region authentically, with carefully planned itineraries and experiences tailored to their travel style.',
+        tema: 'Trentino-Alto Adige, the Dolomites and trips across Italy',
+      },
+      ti: {
+        nome: 'IT Consultation',
+        tag: 'Technology',
+        resumo: 'For those who found us through the tech videos on the channel: a conversation with someone with 20+ years in the field.',
+        detalhes:
+          'A video call about career, projects and technology questions, drawing on more than 20 years of experience in IT.',
+        tema: 'Career, projects and technology',
+      },
+    },
+    minutos: (n) => `${n} minutes`,
+    formato: 'Video call (link sent with the confirmation)',
     detalhesTitulo: 'Service details',
-    detalhes:
-      'Personalized trip planning with local experts in Trentino-Alto Adige and the Dolomites, for travelers who want to discover the region authentically, with carefully planned itineraries and experiences tailored to their travel style.',
-    valor: 'Consultation fee',
-    valorNota: 'Fee to be confirmed. Secure payment via Stripe.',
+    valorNota: 'The fee and payment method are arranged by email when your time is confirmed.',
+    diaSemVaga: 'This day has no open time for this consultation. Please choose another day.',
     dow: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     mesAnterior: 'Previous month',
     proximoMes: 'Next month',
@@ -93,8 +143,8 @@ const TEXT = {
     erroCarregar: "We couldn't load the available times right now.",
     tentarNovamente: 'Try again',
     semVagasMes: 'No times available this month. Check the next months.',
-    mensagemPedido: (dia, local, italia) =>
-      `Hello! I'd like to book the travel consultation on ${dia} at ${local} (my time), ${italia} in Italy.\n\nAbout the trip: `,
+    mensagemPedido: (tipo, dia, local, italia, ehTi) =>
+      `Hello! I'd like to book the ${tipo} on ${dia} at ${local} (my time), ${italia} in Italy.\n\n${ehTi ? 'About the topic' : 'About the trip'}: `,
     estacoes: {
       inverno: ['Winter', 'Snow in the Dolomites'],
       primavera: ['Spring', 'Flowers in the valleys'],
@@ -208,7 +258,13 @@ export default function BookingWidget() {
     [t.locale, visitorTz]
   );
 
-  // Disponibilidade por mês, buscada no servidor: { 'AAAA-MM': { status, dias, duracaoMin } }
+  // Tipo de consultoria: vem da URL (?tipo=ti) ou usa a completa
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tipoUrl = searchParams.get('tipo');
+  const tipo = TIPO_IDS.includes(tipoUrl) ? tipoUrl : TIPO_PADRAO;
+  const tipoTexto = t.tipos[tipo];
+
+  // Disponibilidade por tipo e mês, buscada no servidor: { 'tipo|AAAA-MM': { status, dias, duracaoMin } }
   const [dispo, setDispo] = useState({});
   const [view, setView] = useState(first); // abre sempre no mês atual
   const [selectedDay, setSelectedDay] = useState(null);
@@ -216,7 +272,7 @@ export default function BookingWidget() {
   const autoSelecionou = useRef(false);
   const pedidos = useRef(new Set()); // meses já pedidos ao servidor
 
-  const viewKey = monthKey(view);
+  const viewKey = `${tipo}|${monthKey(view)}`;
   const mesAtual = dispo[viewKey];
 
   // Busca o mês visível no servidor (uma vez por mês; o resultado fica guardado)
@@ -224,25 +280,32 @@ export default function BookingWidget() {
     if (mesAtual || pedidos.current.has(viewKey)) return;
     pedidos.current.add(viewKey);
     const guardar = (valor) => setDispo((d) => ({ ...d, [viewKey]: valor }));
-    fetch(`/api/disponibilidade?mes=${viewKey}`)
+    fetch(`/api/disponibilidade?mes=${monthKey(view)}&tipo=${tipo}`)
       .then((r) => r.json().then((j) => ({ ok: r.ok && j.ok, j })))
       .then(({ ok, j }) => guardar(ok ? { status: 'ok', dias: j.dias || {}, duracaoMin: j.duracaoMin } : { status: 'erro' }))
       .catch(() => guardar({ status: 'erro' }));
-  }, [viewKey, mesAtual]);
+  }, [viewKey, mesAtual, view, tipo]);
 
-  const slotsFor = (d) => dispo[monthKey(d)]?.dias?.[dayKey(d)] ?? [];
-  const duracao = mesAtual?.duracaoMin || DURATION_MIN;
+  const slotsFor = (d) => dispo[`${tipo}|${monthKey(d)}`]?.dias?.[dayKey(d)] ?? [];
+  const duracao = mesAtual?.duracaoMin || DURACAO_PADRAO[tipo];
+
+  function escolherTipo(novo) {
+    setSelectedSlot(null);
+    const params = new URLSearchParams(searchParams);
+    params.set('tipo', novo);
+    setSearchParams(params, { replace: true });
+  }
 
   // Ao carregar o mês atual pela primeira vez, já seleciona o primeiro dia livre dele
   useEffect(() => {
-    if (autoSelecionou.current || mesAtual?.status !== 'ok' || viewKey !== monthKey(first)) return;
+    if (autoSelecionou.current || mesAtual?.status !== 'ok' || monthKey(view) !== monthKey(first)) return;
     autoSelecionou.current = true;
     const primeiro = Object.keys(mesAtual.dias).sort()[0];
     if (primeiro) {
       const [y, m, d] = primeiro.split('-').map(Number);
       setSelectedDay(new Date(y, m - 1, d));
     }
-  }, [mesAtual, viewKey, first]);
+  }, [mesAtual, view, first]);
 
   function goTo(month) {
     autoSelecionou.current = true;
@@ -264,7 +327,7 @@ export default function BookingWidget() {
 
   function solicitarHorario() {
     const dia = fmt.longDay.format(selectedDay);
-    const mensagem = t.mensagemPedido(dia, fmt.local.format(selectedSlot), fmt.rome.format(selectedSlot));
+    const mensagem = t.mensagemPedido(tipoTexto.nome, dia, fmt.local.format(selectedSlot), fmt.rome.format(selectedSlot), tipo === 'ti');
     navigate('/contato', { state: { mensagem } });
   }
 
@@ -286,8 +349,44 @@ export default function BookingWidget() {
   const fact = 'flex gap-2.5 items-start text-[13.5px] text-stone-700';
 
   return (
+    <div className="grid gap-5">
+    <div role="radiogroup" aria-label={t.escolhaTipo}>
+      <p className="text-sm font-medium text-forest-900 mb-3">{t.escolhaTipo}</p>
+      <div className="grid sm:grid-cols-3 gap-3">
+        {TIPO_IDS.map((id) => {
+          const ativo = id === tipo;
+          const tt = t.tipos[id];
+          return (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={ativo}
+              onClick={() => escolherTipo(id)}
+              className={`text-left rounded-xl border p-4 transition-colors min-w-0 flex flex-col justify-start ${
+                ativo
+                  ? 'bg-forest-700 border-forest-700 text-white'
+                  : 'bg-white border-forest-900/15 hover:border-forest-600'
+              }`}
+            >
+              <span className="flex items-center justify-between gap-2 mb-1.5">
+                <span className={`text-[10px] font-medium uppercase tracking-[0.08em] ${ativo ? 'text-white/70' : 'text-forest-600'}`}>
+                  {tt.tag}
+                </span>
+                <span className={`inline-flex items-center gap-1 text-[11px] tabular-nums ${ativo ? 'text-white/80' : 'text-stone-700/70'}`}>
+                  <Svg size={12}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Svg>
+                  {t.minutos(dispo[`${id}|${monthKey(view)}`]?.duracaoMin || DURACAO_PADRAO[id])}
+                </span>
+              </span>
+              <span className="block font-display text-lg leading-snug mb-1">{tt.nome}</span>
+              <span className={`block text-[12.5px] leading-relaxed ${ativo ? 'text-white/80' : 'text-stone-700'}`}>{tt.resumo}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
     <section
-      aria-label={t.titulo}
+      aria-label={tipoTexto.nome}
       className="bg-white border border-forest-900/10 rounded-2xl shadow-[0_12px_32px_-18px_rgba(30,42,23,0.25)] grid md:grid-cols-2 lg:grid-cols-[0.9fr_1.3fr_0.8fr] overflow-hidden"
     >
       {/* Painel 1: a consultoria */}
@@ -301,7 +400,7 @@ export default function BookingWidget() {
             <p className="text-sm font-medium">Lídice · Verditalia</p>
           </div>
         </div>
-        <h2 className="font-display text-[22px] leading-tight text-forest-900 mb-3">{t.titulo}</h2>
+        <h2 className="font-display text-[22px] leading-tight text-forest-900 mb-3">{tipoTexto.nome}</h2>
         <details className="group mb-4 text-[13px] text-stone-700">
           <summary className="cursor-pointer list-none inline-flex items-center gap-1.5 text-forest-700 font-medium [&::-webkit-details-marker]:hidden">
             {t.detalhesTitulo}
@@ -309,12 +408,12 @@ export default function BookingWidget() {
               <Svg size={14} strokeWidth={1.8}><path d="M6 9l6 6 6-6" /></Svg>
             </span>
           </summary>
-          <p className="mt-2 leading-relaxed">{t.detalhes}</p>
+          <p className="mt-2 leading-relaxed">{tipoTexto.detalhes}</p>
         </details>
         <ul className="grid gap-2.5 mb-5">
           <li className={fact}>
             <span className="text-forest-600 mt-0.5"><Svg size={16}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Svg></span>
-            {t.duracao}
+            {t.minutos(duracao)}
           </li>
           <li className={fact}>
             <span className="text-forest-600 mt-0.5"><Svg size={16}><rect x="3" y="6" width="13" height="12" rx="2" /><path d="M16 10l5-3v10l-5-3" /></Svg></span>
@@ -322,14 +421,10 @@ export default function BookingWidget() {
           </li>
           <li className={fact}>
             <span className="text-forest-600 mt-0.5"><Svg size={16}><path d="M2.5 19.5L9 8l4 7 2.5-4 6 8.5h-19z" /></Svg></span>
-            {t.regiao}
+            {tipoTexto.tema}
           </li>
         </ul>
-        <div className="border-t border-forest-900/10 pt-4 flex justify-between items-baseline gap-2">
-          <span className="text-xs text-stone-700/70">{t.valor}</span>
-          <strong className="font-display font-normal text-[22px]">€ —</strong>
-        </div>
-        <p className="text-xs text-stone-700/70 mt-2.5">{t.valorNota}</p>
+        <p className="border-t border-forest-900/10 pt-4 text-xs text-stone-700/80 leading-relaxed">{t.valorNota}</p>
       </div>
 
       {/* Painel 2: calendário */}
@@ -461,7 +556,9 @@ export default function BookingWidget() {
         <p className="text-sm font-medium mb-1">{selectedDay ? cap(fmt.longDay.format(selectedDay)) : t.escolhaDia}</p>
         <p className="text-xs text-stone-700/70 mb-4">{t.seuFuso(city)}</p>
 
-        {selectedDay ? (
+        {selectedDay && !carregando && daySlots.length === 0 ? (
+          <p className="text-[13px] text-stone-700/80 py-4">{t.diaSemVaga}</p>
+        ) : selectedDay ? (
           <div className="grid gap-2">
             {daySlots.map((at) => {
               const active = sameDay(at, selectedSlot);
@@ -507,5 +604,6 @@ export default function BookingWidget() {
         )}
       </div>
     </section>
+    </div>
   );
 }

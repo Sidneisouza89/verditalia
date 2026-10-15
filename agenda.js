@@ -15,7 +15,9 @@
 //   GOOGLE_CALENDAR_IDS     agendas que bloqueiam horário, separadas por vírgula (padrão: primary)
 //   AGENDA_HORARIOS         ex.: "13:00,14:30,16:00,17:30,19:00" (horário da Itália)
 //   AGENDA_DIAS_SEMANA      ex.: "1,2,3,4,5" (0=domingo ... 6=sábado)
-//   AGENDA_DURACAO_MIN      ex.: "60"
+//   AGENDA_DURACAO_EXPRESS  duração da Consultoria Express, em minutos (padrão 30)
+//   AGENDA_DURACAO_COMPLETA duração da Consultoria Completa de Viagem (padrão 60)
+//   AGENDA_DURACAO_TI       duração da Consultoria de TI (padrão 60)
 //   AGENDA_ANTECEDENCIA_DIAS ex.: "2"
 //   AGENDA_MESES_A_FRENTE   ex.: "5" (mês atual + 5 = 6 meses)
 
@@ -26,10 +28,19 @@ export const AGENDA = {
   fuso: 'Europe/Rome',
   horarios: lista(process.env.AGENDA_HORARIOS, ['13:00', '14:30', '16:00', '17:30', '19:00']),
   diasSemana: lista(process.env.AGENDA_DIAS_SEMANA, ['1', '2', '3', '4', '5']).map(Number),
-  duracaoMin: numero(process.env.AGENDA_DURACAO_MIN, 60),
   antecedenciaDias: numero(process.env.AGENDA_ANTECEDENCIA_DIAS, 2),
   mesesAFrente: numero(process.env.AGENDA_MESES_A_FRENTE, 5),
 };
+
+// Tipos de consultoria: cada um com sua duração. Os horários de início são os mesmos;
+// o que muda é o tamanho da janela que precisa estar livre na agenda.
+export const TIPOS = {
+  express: { duracaoMin: numero(process.env.AGENDA_DURACAO_EXPRESS, 30) },
+  completa: { duracaoMin: numero(process.env.AGENDA_DURACAO_COMPLETA, numero(process.env.AGENDA_DURACAO_MIN, 60)) },
+  ti: { duracaoMin: numero(process.env.AGENDA_DURACAO_TI, 60) },
+};
+export const TIPO_PADRAO = 'completa';
+export const validarTipo = (tipo) => (Object.hasOwn(TIPOS, tipo || '') ? tipo : null);
 
 const CALENDARIOS = lista(process.env.GOOGLE_CALENDAR_IDS, ['primary']);
 
@@ -155,9 +166,11 @@ function exemplo(ano, mes0, dia) {
 const cache = new Map(); // "AAAA-MM" -> { em, dados }
 const CACHE_MS = 2 * 60 * 1000;
 
-export async function disponibilidade(mesValido, agora = new Date()) {
+export async function disponibilidade(mesValido, tipo = TIPO_PADRAO, agora = new Date()) {
   const { ano, mes0 } = mesValido;
-  const chave = `${ano}-${pad(mes0 + 1)}`;
+  const mesChave = `${ano}-${pad(mes0 + 1)}`;
+  const chave = `${tipo}|${mesChave}`;
+  const duracaoMin = TIPOS[tipo].duracaoMin;
   const emCache = cache.get(chave);
   if (emCache && Date.now() - emCache.em < CACHE_MS) return emCache.dados;
 
@@ -169,7 +182,7 @@ export async function disponibilidade(mesValido, agora = new Date()) {
     const inicio = italiaParaInstante(ano, mes0, 1);
     const fim = italiaParaInstante(ano, mes0 + 1, 1);
     const ocupados = candidatos.length ? await ocupadosNoGoogle(inicio, fim) : [];
-    const duracao = AGENDA.duracaoMin * 60_000;
+    const duracao = duracaoMin * 60_000;
     const limite = agora.getTime(); // a antecedência mínima já foi aplicada por dia; aqui só garante nada no passado
     for (const dia of candidatos) {
       const livres = AGENDA.horarios.filter((hhmm) => {
@@ -188,7 +201,7 @@ export async function disponibilidade(mesValido, agora = new Date()) {
     }
   }
 
-  const dados = { fonte, fuso: AGENDA.fuso, duracaoMin: AGENDA.duracaoMin, mesesAFrente: AGENDA.mesesAFrente, mes: chave, dias };
+  const dados = { fonte, fuso: AGENDA.fuso, tipo, duracaoMin, mesesAFrente: AGENDA.mesesAFrente, mes: mesChave, dias };
   cache.set(chave, { em: Date.now(), dados });
   return dados;
 }
