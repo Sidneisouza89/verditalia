@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useText } from '../i18n/LanguageContext';
+import { useLang, useText } from '../i18n/LanguageContext';
+import { tx, txLista, useConteudo } from '../cms/ConteudoContext';
+import { urlImagem } from '../cms/imagem';
 
-const TEXT = {
+export const TEXT = {
   pt: {
     planEyebrow: 'Planejamento personalizado',
     planTitulo: 'Sua viagem, do seu jeito.',
@@ -46,11 +48,10 @@ const TEXT = {
 
 // Último vídeo do canal. Para trocar, basta mudar o ID e o título
 // (no futuro isso vem do CMS).
-const VIDEO = {
+export const VIDEO = {
   id: 'Wg-2UbbbzhY',
   titulo: 'Assis, Úmbria',
 };
-const VIDEO_URL = `https://youtu.be/${VIDEO.id}`;
 
 // Tipografia compartilhada pelos dois blocos (mesma da referência)
 const eyebrow = 'text-[11px] md:text-xs tracking-[0.08em] uppercase text-forest-600 font-medium mb-3';
@@ -77,17 +78,25 @@ function Check() {
 
 export default function PlanejamentoConteudo() {
   const t = useText(TEXT);
+  const { lang } = useLang();
+  const cms = useConteudo()?.inicio;
+  const p = cms?.planejamento;
+  const y = cms?.youtube;
+  const videoId = y?.videoId?.trim() || VIDEO.id;
+  const videoTitulo = tx(y?.videoTitulo, lang) ?? VIDEO.titulo;
+  const VIDEO_URL = `https://youtu.be/${videoId}`;
+  const capaPropria = urlImagem(y?.capa, { w: 900, h: 760 });
   return (
     <section id="planejamento" className="bg-cream-200">
       <div className="grid lg:grid-cols-2">
         {/* Planejamento / Consultoria */}
         <div className="grid md:grid-cols-[1.2fr_1fr] items-stretch gap-0 md:gap-6 px-6 md:pr-0 lg:pl-10 border-b lg:border-b-0 lg:border-r border-forest-900/10">
           <div className="py-8">
-            <p className={eyebrow}>{t.planEyebrow}</p>
-            <h3 className={titulo}>{t.planTitulo}</h3>
-            <p className={corpo}>{t.planCorpo}</p>
+            <p className={eyebrow}>{tx(p?.eyebrow, lang) ?? t.planEyebrow}</p>
+            <h3 className={titulo}>{tx(p?.titulo, lang) ?? t.planTitulo}</h3>
+            <p className={corpo}>{tx(p?.texto, lang) ?? t.planCorpo}</p>
             <ul className="space-y-2.5 mb-7">
-              {t.beneficios.map((b) => (
+              {(txLista(p?.beneficios, lang) ?? t.beneficios).map((b) => (
                 <li key={b} className="flex items-center gap-2.5 text-sm text-forest-900">
                   <Check />
                   {b}
@@ -102,8 +111,8 @@ export default function PlanejamentoConteudo() {
             </Link>
           </div>
           <img
-            src="https://images.unsplash.com/photo-1499591934245-40b55745b905?auto=format&fit=crop&w=900&q=80"
-            alt={t.planAlt}
+            src={urlImagem(p?.foto, { w: 1000 }) ?? 'https://images.unsplash.com/photo-1499591934245-40b55745b905?auto=format&fit=crop&w=900&q=80'}
+            alt={tx(p?.foto?.alt, lang) ?? t.planAlt}
             className="h-56 md:h-full w-full object-cover rounded-xl md:rounded-none mb-8 md:mb-0 md-fade-left"
             style={{ '--fade': '35%' }}
           />
@@ -112,9 +121,9 @@ export default function PlanejamentoConteudo() {
         {/* YouTube */}
         <div id="youtube" className="grid md:grid-cols-[1.1fr_1fr] items-center gap-6 px-6 lg:px-10 py-8">
           <div>
-            <p className={eyebrow}>{t.ytEyebrow}</p>
-            <h3 className={titulo}>{t.ytTitulo}</h3>
-            <p className={corpo}>{t.ytCorpo}</p>
+            <p className={eyebrow}>{tx(y?.eyebrow, lang) ?? t.ytEyebrow}</p>
+            <h3 className={titulo}>{tx(y?.titulo, lang) ?? t.ytTitulo}</h3>
+            <p className={corpo}>{tx(y?.texto, lang) ?? t.ytCorpo}</p>
             <a
               href={VIDEO_URL}
               target="_blank"
@@ -149,12 +158,12 @@ export default function PlanejamentoConteudo() {
             className="relative block aspect-[4/3.4] rounded-xl overflow-hidden group shadow-sm"
           >
             <img
-              src={`https://img.youtube.com/vi/${VIDEO.id}/maxresdefault.jpg`}
+              src={capaPropria ?? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
               onError={(e) => {
                 e.currentTarget.onerror = null;
-                e.currentTarget.src = `https://img.youtube.com/vi/${VIDEO.id}/hqdefault.jpg`;
+                e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
               }}
-              alt={`${t.ytAlt}: ${VIDEO.titulo}`}
+              alt={`${t.ytAlt}: ${videoTitulo}`}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             {/* escurece só a base, para o título ficar legível */}
@@ -168,7 +177,7 @@ export default function PlanejamentoConteudo() {
               </svg>
             </span>
             <p className="absolute left-4 right-4 bottom-4 text-white text-sm font-medium uppercase tracking-wide leading-snug">
-              {VIDEO.titulo}
+              {videoTitulo}
             </p>
           </a>
         </div>

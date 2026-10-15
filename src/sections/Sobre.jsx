@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-import { useText } from '../i18n/LanguageContext';
+import { useLang, useText } from '../i18n/LanguageContext';
+import { tx, txLista, useConteudo } from '../cms/ConteudoContext';
+import { urlImagem } from '../cms/imagem';
 
 // Ícones em traço fino, mesma linguagem do "Nossa casa" na home
 const Icon = ({ children, size = 30 }) => (
@@ -55,7 +57,7 @@ const ICONES = {
   ),
 };
 
-const TEXT = {
+export const TEXT = {
   pt: {
     eyebrow: 'Quem sou eu',
     titulo: 'Uma vida entre tecnologia, natureza e beleza.',
@@ -145,14 +147,31 @@ const titulo = 'font-display font-normal text-[1.75rem] md:text-[2.1rem] leading
 const corpo = 'text-stone-700 text-sm leading-relaxed';
 
 export default function Sobre() {
-  const t = useText(TEXT);
+  const base = useText(TEXT);
+  const { lang } = useLang();
+  const c = useConteudo()?.sobre;
+  // conteúdo do CMS quando preenchido; senão, o texto padrão
+  const t = {
+    ...base,
+    titulo: tx(c?.titulo, lang) ?? base.titulo,
+    fotoAlt: tx(c?.foto?.alt, lang) ?? base.fotoAlt,
+    bio: txLista(c?.bio, lang) ?? base.bio,
+    bioFecho: tx(c?.bioFecho, lang) ?? base.bioFecho,
+    alpesTitulo: tx(c?.alpesTitulo, lang) ?? base.alpesTitulo,
+    alpes: txLista(c?.alpes, lang) ?? base.alpes,
+    citacao: tx(c?.citacao, lang) ?? base.citacao,
+    alpesAlt: tx(c?.fotoAlpes?.alt, lang) ?? base.alpesAlt,
+    nasceuTitulo: tx(c?.nasceuTitulo, lang) ?? base.nasceuTitulo,
+    nasceu: txLista(c?.nasceu, lang) ?? base.nasceu,
+    nasceuDestaque: tx(c?.nasceuDestaque, lang) ?? base.nasceuDestaque,
+  };
   return (
     <section id="sobre" className="bg-cream-100 pt-6 md:pt-8 pb-16 md:pb-24">
       <div className="max-w-[1100px] mx-auto px-6 lg:px-10">
         {/* Quem sou eu: foto + texto */}
         <div className="grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-8 md:gap-12 items-start">
           <img
-            src="https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=900&q=80"
+            src={urlImagem(c?.foto, { w: 1000 }) ?? 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=900&q=80'}
             alt={t.fotoAlt}
             className="rounded-2xl w-full h-[320px] md:h-full md:min-h-[520px] object-cover"
           />
@@ -198,7 +217,7 @@ export default function Sobre() {
           </div>
           <figure className="relative">
             <img
-              src="https://images.unsplash.com/photo-1502786129293-79981df4e689?auto=format&fit=crop&w=1000&q=80"
+              src={urlImagem(c?.fotoAlpes, { w: 1200 }) ?? 'https://images.unsplash.com/photo-1502786129293-79981df4e689?auto=format&fit=crop&w=1000&q=80'}
               alt={t.alpesAlt}
               className="rounded-2xl w-full h-[300px] md:h-[440px] object-cover"
             />

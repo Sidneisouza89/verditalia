@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-import { useText } from '../i18n/LanguageContext';
+import { useLang, useText } from '../i18n/LanguageContext';
+import { tx, useConteudo } from '../cms/ConteudoContext';
+import { urlImagem } from '../cms/imagem';
 import ItaliaMapa from '../components/ItaliaMapa';
 
 // Ícones em traço fino, mesma linguagem visual da referência
@@ -24,7 +26,7 @@ const IconeBussola = () => (
 
 const ICONES = [IconePin, IconeMontanha, IconeBussola];
 
-const TEXT = {
+export const TEXT = {
   pt: {
     eyebrow: 'Nossa casa',
     titulo: 'Trentino-Alto Adige, onde tudo começa.',
@@ -58,7 +60,17 @@ const TEXT = {
 };
 
 export default function NossaCasa() {
-  const t = useText(TEXT);
+  const base = useText(TEXT);
+  const { lang } = useLang();
+  const c = useConteudo()?.inicio?.nossaCasa;
+  // conteúdo do CMS quando preenchido; senão, o texto padrão
+  const t = {
+    ...base,
+    eyebrow: tx(c?.eyebrow, lang) ?? base.eyebrow,
+    titulo: tx(c?.titulo, lang) ?? base.titulo,
+    corpo: tx(c?.texto, lang) ?? base.corpo,
+    alt: tx(c?.foto?.alt, lang) ?? base.alt,
+  };
   return (
     <section id="nossa-casa" className="bg-cream-100 grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
       {/* Texto + diferenciais */}
@@ -103,7 +115,7 @@ export default function NossaCasa() {
       {/* Foto ampliada: ocupa toda a altura do bloco e encosta na borda direita */}
       <div className="relative min-h-[300px] lg:min-h-0">
         <img
-          src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1600&q=80"
+          src={urlImagem(c?.foto, { w: 1800 }) ?? 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1600&q=80'}
           alt={t.alt}
           className="absolute inset-0 w-full h-full object-cover md-fade-left"
           style={{ '--fade': '28%' }}

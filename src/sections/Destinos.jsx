@@ -1,9 +1,11 @@
 import DestinoCard from '../components/DestinoCard';
-import { useText } from '../i18n/LanguageContext';
+import { useLang, useText } from '../i18n/LanguageContext';
+import { tx, txLista, useConteudo } from '../cms/ConteudoContext';
+import { urlImagem } from '../cms/imagem';
 
 // Ordem visual = prioridade de autoridade regional (definida pela Lídice).
 // Dolomitas ainda não tem checkout pronto -> exibido como "em breve".
-const DESTINOS = [
+export const DESTINOS = [
   {
     slug: 'dolomitas',
     image: 'https://images.unsplash.com/photo-1694630515448-344264b30507?auto=format&fit=crop&w=900&q=80',
@@ -36,7 +38,7 @@ const DESTINOS = [
   },
 ];
 
-const TEXT = {
+export const TEXT = {
   pt: {
     eyebrow: 'NOSSOS GUIAS AUTORAIS',
     titulo: 'Guias completos para você explorar o melhor da Itália.',
@@ -83,20 +85,41 @@ const TEXT = {
 
 export default function Destinos() {
   const t = useText(TEXT);
+  const { lang } = useLang();
+  const c = useConteudo()?.inicio?.guias;
+
+  // Guias do CMS (ordem, textos, fotos e links da Lídice); campos vazios usam o padrão do guia
+  const padrao = (slug) => DESTINOS.find((d) => d.slug === slug);
+  const guias = c?.lista?.length
+    ? c.lista.map((g, i) => {
+        const p = padrao(g.id) || {};
+        const pt = t.guias[g.id] || {};
+        return {
+          slug: g.id || `guia-${i}`,
+          icon: p.icon ?? DESTINOS[0].icon,
+          image: urlImagem(g.foto, { w: 900, h: 840 }) ?? p.image ?? DESTINOS[0].image,
+          title: (tx(g.titulo, lang) ?? pt.title ?? '').toUpperCase(),
+          description: tx(g.descricao, lang) ?? pt.description ?? '',
+          stats: txLista(g.destaques, lang) ?? [],
+          checkoutUrl: g.link || undefined,
+          comingSoon: Boolean(g.emBreve) || !g.link,
+        };
+      })
+    : DESTINOS.map((d) => ({ ...d, ...t.guias[d.slug] }));
   return (
     <section id="guias" className="max-w-[1800px] mx-auto px-4 lg:px-6 pt-10 md:pt-14 pb-8 md:pb-10">
       <div className="text-center mb-10">
         <p className="text-xs tracking-[0.2em] text-forest-600 font-medium mb-3">
-          {t.eyebrow}
+          {tx(c?.eyebrow, lang)?.toUpperCase() ?? t.eyebrow}
         </p>
         <h2 className="font-display text-3xl md:text-4xl text-forest-900">
-          {t.titulo}
+          {tx(c?.titulo, lang) ?? t.titulo}
         </h2>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-        {DESTINOS.map((d) => (
-          <DestinoCard key={d.slug} {...d} {...t.guias[d.slug]} />
+        {guias.map((d) => (
+          <DestinoCard key={d.slug} {...d} />
         ))}
       </div>
     </section>
