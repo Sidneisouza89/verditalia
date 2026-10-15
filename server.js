@@ -9,11 +9,13 @@
 //   CONTACT_TO      e-mail da Lídice que recebe as mensagens (NUNCA vai para o navegador)
 //   CONTACT_FROM    remetente verificado na Resend, ex.: "Verditalia <contato@verditalia.com>"
 //   PORT            definido automaticamente pelo Railway
+//   (agenda/Google Calendar: ver as variáveis listadas no topo de agenda.js)
 
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { AGENDA, disponibilidade, googleConfigurado, validarMes } from './agenda.js';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), 'dist');
 const PORT = Number(process.env.PORT) || 3000;
@@ -165,6 +167,23 @@ async function handleContato(req, res) {
   }
 }
 
+// ---------- GET /api/disponibilidade?mes=AAAA-MM ----------
+
+async function handleDisponibilidade(res, searchParams) {
+  const mes = validarMes(searchParams.get('mes'));
+  if (!mes) {
+    return sendJson(res, 400, { ok: false, error: `Mês inválido ou fora da janela de ${AGENDA.mesesAFrente + 1} meses.` });
+  }
+  try {
+    const dados = await disponibilidade(mes);
+    res.setHeader('Cache-Control', 'no-store');
+    return sendJson(res, 200, { ok: true, ...dados });
+  } catch (err) {
+    console.error('[agenda] Falha ao consultar o Google Calendar:', err);
+    return sendJson(res, 502, { ok: false, error: 'Não foi possível carregar os horários agora.' });
+  }
+}
+
 // ---------- arquivos estáticos + fallback de SPA ----------
 
 async function serveStatic(req, res, pathname) {
@@ -209,7 +228,12 @@ async function serveStatic(req, res, pathname) {
 
 const server = createServer(async (req, res) => {
   try {
-    const { pathname } = new URL(req.url, 'http://localhost');
+    const { pathname, searchParams } = new URL(req.url, 'http://localhost');
+
+    if (pathname === '/api/disponibilidade') {
+      if (req.method !== 'GET') return sendJson(res, 405, { ok: false, error: 'Método não permitido.' });
+      return await handleDisponibilidade(res, searchParams);
+    }
 
     if (pathname === '/api/contato') {
       if (req.method !== 'POST') return sendJson(res, 405, { ok: false, error: 'Método não permitido.' });
@@ -231,4 +255,5 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Verditalia rodando na porta ${PORT}`);
+  console.log(`[agenda] ${googleConfigurado() ? 'Google Calendar conectado' : 'sem credenciais do Google: usando horários de exemplo'}`);
 });

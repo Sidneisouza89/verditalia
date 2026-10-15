@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLang, useText } from '../i18n/LanguageContext';
 
 const TEXT = {
@@ -41,6 +42,8 @@ const inputClass =
 
 export default function Contato() {
   const { lang } = useLang();
+  // Pedido de horário vindo do /agendar chega já escrito na mensagem
+  const mensagemInicial = useLocation().state?.mensagem || '';
   const t = useText(TEXT);
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -111,7 +114,7 @@ export default function Contato() {
             <label className="block text-xs text-forest-800 mb-1.5" htmlFor="mensagem">
               {t.mensagem}
             </label>
-            <textarea id="mensagem" name="mensagem" required rows={5} className={`${inputClass} resize-none`} />
+            <textarea id="mensagem" name="mensagem" required rows={5} defaultValue={mensagemInicial} className={`${inputClass} resize-none`} />
           </div>
           {/* Honeypot: invisível para pessoas, robôs costumam preencher */}
           <div aria-hidden="true" className="absolute -left-[9999px] w-px h-px overflow-hidden">

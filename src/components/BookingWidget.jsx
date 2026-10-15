@@ -1,19 +1,21 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useText } from '../i18n/LanguageContext';
 
 /*
-  Widget de agendamento (protótipo para validação com a Lídice).
+  Widget de agendamento.
   - Abre sempre no mês atual; navega até MONTHS_AHEAD meses à frente.
+  - Os horários livres vêm do servidor (/api/disponibilidade), que consulta a
+    agenda real da Lídice no Google Calendar. As regras (dias, horários,
+    duração, antecedência) ficam no servidor, em agenda.js.
   - Horários definidos no fuso da Itália e mostrados no fuso do visitante.
-  - Disponibilidade é DE EXEMPLO: no futuro vem do Google Calendar (Cal.com),
-    e o botão de continuar leva ao pagamento (Stripe).
+  - Enquanto o pagamento (Stripe) não estiver ligado, o visitante envia o
+    pedido do horário pelo Fale conosco, já preenchido.
 */
 
-const ROME_SLOTS = ['13:00', '14:30', '16:00', '17:30', '19:00']; // tarde na Itália = manhã no Brasil
-const MONTHS_AHEAD = 5; // mês atual + 5 = 6 meses de agenda
-const MIN_NOTICE_DAYS = 2;
-const DURATION_MIN = 60;
+const MONTHS_AHEAD = 5; // mês atual + 5 = 6 meses de agenda (mesmo valor de AGENDA_MESES_A_FRENTE no servidor)
+const DURATION_MIN = 60; // padrão; o servidor informa a duração real
+export const PAGAMENTO_ATIVO = false; // vira true quando o Stripe estiver configurado
 
 const TEXT = {
   pt: {
@@ -41,8 +43,14 @@ const TEXT = {
     seuHorario: 'seu horário',
     continuar: 'Continuar para pagamento',
     reserva: 'A vaga fica reservada por 15 minutos enquanto você conclui o pagamento.',
-    emBreve: 'O pagamento online chega em breve. Por enquanto,',
-    faleConosco: 'fale com a gente para reservar este horário',
+    solicitar: 'Solicitar este horário',
+    solicitarNota: 'Você envia o pedido pelo Fale conosco e recebe a confirmação por e-mail.',
+    carregando: 'Carregando horários livres…',
+    erroCarregar: 'Não foi possível carregar os horários agora.',
+    tentarNovamente: 'Tentar novamente',
+    semVagasMes: 'Sem horários livres neste mês. Veja os próximos meses.',
+    mensagemPedido: (dia, local, italia) =>
+      `Olá! Gostaria de agendar a consultoria de viagem em ${dia}, às ${local} (meu horário), ${italia} na Itália.\n\nSobre a viagem: `,
     estacoes: {
       inverno: ['Inverno', 'Neve nas Dolomitas'],
       primavera: ['Primavera', 'Flores nos vales'],
@@ -75,8 +83,14 @@ const TEXT = {
     seuHorario: 'your time',
     continuar: 'Continue to payment',
     reserva: 'Your slot is held for 15 minutes while you complete the payment.',
-    emBreve: 'Online payment is coming soon. For now,',
-    faleConosco: 'contact us to book this time',
+    solicitar: 'Request this time',
+    solicitarNota: 'You send the request through our contact form and get a confirmation by email.',
+    carregando: 'Loading available times…',
+    erroCarregar: "We couldn't load the available times right now.",
+    tentarNovamente: 'Try again',
+    semVagasMes: 'No times available this month. Check the next months.',
+    mensagemPedido: (dia, local, italia) =>
+      `Hello! I'd like to book the travel consultation on ${dia} at ${local} (my time), ${italia} in Italy.\n\nAbout the trip: `,
     estacoes: {
       inverno: ['Winter', 'Snow in the Dolomites'],
       primavera: ['Spring', 'Flowers in the valleys'],
@@ -160,26 +174,19 @@ const startOfToday = () => {
 const sameDay = (a, b) => !!a && !!b && a.getTime() === b.getTime();
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// Disponibilidade de exemplo, estável por data
-function exampleSlots(day, minDay) {
-  const wd = day.getDay();
-  if (wd === 0 || wd === 6 || day < minDay) return [];
-  const s = ((day.getFullYear() * 372 + day.getMonth() * 31 + day.getDate()) * 2654435761) % 4294967296;
-  if (s % 7 === 0) return [];
-  return ROME_SLOTS.filter((_, i) => ((s >> (i * 3)) & 7) > 2);
-}
+const pad2 = (n) => String(n).padStart(2, '0');
+const monthKey = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
+const dayKey = (d) => `${monthKey(d)}-${pad2(d.getDate())}`;
 
 // ---------- componente ----------
 export default function BookingWidget() {
   const t = useText(TEXT);
 
-  const { today, first, last, minDay, visitorTz } = useMemo(() => {
+  const navigate = useNavigate();
+  const { today, first, last, visitorTz } = useMemo(() => {
     const today = startOfToday();
-    const minDay = new Date(today);
-    minDay.setDate(minDay.getDate() + MIN_NOTICE_DAYS);
     return {
       today,
-      minDay,
       first: new Date(today.getFullYear(), today.getMonth(), 1),
       last: new Date(today.getFullYear(), today.getMonth() + MONTHS_AHEAD, 1),
       visitorTz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Sao_Paulo',
@@ -197,27 +204,69 @@ export default function BookingWidget() {
     [t.locale, visitorTz]
   );
 
-  const slotsFor = (d) => exampleSlots(d, minDay);
-
-  // Abre sempre no mês atual, já com o primeiro dia livre dele selecionado
-  const [view, setView] = useState(first);
-  const [selectedDay, setSelectedDay] = useState(() => {
-    for (const d = new Date(minDay); d.getMonth() === today.getMonth(); d.setDate(d.getDate() + 1)) {
-      if (exampleSlots(d, minDay).length) return new Date(d);
-    }
-    return null;
-  });
+  // Disponibilidade por mês, buscada no servidor: { 'AAAA-MM': { status, dias, duracaoMin } }
+  const [dispo, setDispo] = useState({});
+  const [view, setView] = useState(first); // abre sempre no mês atual
+  const [selectedDay, setSelectedDay] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [tentouPagar, setTentouPagar] = useState(false);
+  const autoSelecionou = useRef(false);
+  const pedidos = useRef(new Set()); // meses já pedidos ao servidor
+
+  const viewKey = monthKey(view);
+  const mesAtual = dispo[viewKey];
+
+  // Busca o mês visível no servidor (uma vez por mês; o resultado fica guardado)
+  useEffect(() => {
+    if (mesAtual || pedidos.current.has(viewKey)) return;
+    pedidos.current.add(viewKey);
+    const guardar = (valor) => setDispo((d) => ({ ...d, [viewKey]: valor }));
+    fetch(`/api/disponibilidade?mes=${viewKey}`)
+      .then((r) => r.json().then((j) => ({ ok: r.ok && j.ok, j })))
+      .then(({ ok, j }) => guardar(ok ? { status: 'ok', dias: j.dias || {}, duracaoMin: j.duracaoMin } : { status: 'erro' }))
+      .catch(() => guardar({ status: 'erro' }));
+  }, [viewKey, mesAtual]);
+
+  const slotsFor = (d) => dispo[monthKey(d)]?.dias?.[dayKey(d)] ?? [];
+  const duracao = mesAtual?.duracaoMin || DURATION_MIN;
+
+  // Ao carregar o mês atual pela primeira vez, já seleciona o primeiro dia livre dele
+  useEffect(() => {
+    if (autoSelecionou.current || mesAtual?.status !== 'ok' || viewKey !== monthKey(first)) return;
+    autoSelecionou.current = true;
+    const primeiro = Object.keys(mesAtual.dias).sort()[0];
+    if (primeiro) {
+      const [y, m, d] = primeiro.split('-').map(Number);
+      setSelectedDay(new Date(y, m - 1, d));
+    }
+  }, [mesAtual, viewKey, first]);
 
   function goTo(month) {
+    autoSelecionou.current = true;
     setView(month);
     if (selectedDay && (selectedDay.getMonth() !== month.getMonth() || selectedDay.getFullYear() !== month.getFullYear())) {
       setSelectedDay(null);
       setSelectedSlot(null);
     }
-    setTentouPagar(false);
   }
+
+  function tentarDeNovo() {
+    pedidos.current.delete(viewKey);
+    setDispo((d) => {
+      const novo = { ...d };
+      delete novo[viewKey];
+      return novo;
+    });
+  }
+
+  function solicitarHorario() {
+    const dia = fmt.longDay.format(selectedDay);
+    const mensagem = t.mensagemPedido(dia, fmt.local.format(selectedSlot), fmt.rome.format(selectedSlot));
+    navigate('/contato', { state: { mensagem } });
+  }
+
+  const carregando = !mesAtual;
+  const erro = mesAtual?.status === 'erro';
+  const semVagas = mesAtual?.status === 'ok' && Object.keys(mesAtual.dias).length === 0;
 
   const months = Array.from({ length: MONTHS_AHEAD + 1 }, (_, i) => new Date(first.getFullYear(), first.getMonth() + i, 1));
   const season = seasonKey(view.getMonth());
@@ -350,16 +399,16 @@ export default function BookingWidget() {
                 aria-pressed={free ? isSel : undefined}
                 aria-label={`${fmt.longDay.format(d)}, ${free ? t.horariosLivres(free) : t.semHorarios}`}
                 onClick={() => {
+                  autoSelecionou.current = true;
                   setSelectedDay(d);
                   setSelectedSlot(null);
-                  setTentouPagar(false);
                 }}
                 className={`relative aspect-square rounded-[10px] border text-sm tabular-nums grid place-items-center transition-colors ${
                   isSel
                     ? 'bg-forest-700 border-forest-700 text-white font-medium'
                     : free
                     ? 'bg-cream-200 border-transparent font-medium hover:border-forest-600'
-                    : 'border-transparent text-forest-900/30 cursor-default'
+                    : `border-transparent text-forest-900/30 cursor-default ${carregando ? 'animate-pulse' : ''}`
                 }`}
               >
                 {d.getDate()}
@@ -370,6 +419,21 @@ export default function BookingWidget() {
             );
           })}
         </div>
+
+        {(carregando || erro || semVagas) && (
+          <p className="mt-4 text-[13px] text-stone-700" role="status" aria-live="polite">
+            {carregando && t.carregando}
+            {semVagas && t.semVagasMes}
+            {erro && (
+              <>
+                {t.erroCarregar}{' '}
+                <button type="button" onClick={tentarDeNovo} className="underline underline-offset-2 text-forest-700">
+                  {t.tentarNovamente}
+                </button>
+              </>
+            )}
+          </p>
+        )}
 
         <div className="flex gap-4 flex-wrap mt-4 text-xs text-stone-700/70">
           <span className="inline-flex items-center gap-1.5">
@@ -397,10 +461,7 @@ export default function BookingWidget() {
                   key={at.getTime()}
                   type="button"
                   aria-pressed={active}
-                  onClick={() => {
-                    setSelectedSlot(at);
-                    setTentouPagar(false);
-                  }}
+                  onClick={() => setSelectedSlot(at)}
                   className={`flex justify-between items-baseline gap-2 rounded-lg border px-3 py-2.5 text-left tabular-nums transition-colors ${
                     active ? 'bg-forest-700 border-forest-700 text-white' : 'bg-white border-forest-900/20 hover:border-forest-600'
                   }`}
@@ -421,28 +482,18 @@ export default function BookingWidget() {
           <div className="mt-4 grid gap-2.5">
             <div className="bg-cream-200 rounded-[10px] px-3.5 py-3 text-[13px]">
               <strong className="block font-medium">{cap(fmt.longDay.format(selectedDay))}</strong>
-              {fmt.local.format(selectedSlot)} ({t.seuHorario}) · {fmt.rome.format(selectedSlot)} {t.naItalia} · {DURATION_MIN} min
+              {fmt.local.format(selectedSlot)} ({t.seuHorario}) · {fmt.rome.format(selectedSlot)} {t.naItalia} · {duracao} min
             </div>
+            {/* Sem Stripe: o pedido vai para o Fale conosco já preenchido. Com Stripe: segue para o pagamento. */}
             <button
               type="button"
-              onClick={() => setTentouPagar(true)}
+              onClick={solicitarHorario}
               className="inline-flex justify-center items-center gap-2 rounded-lg bg-forest-600 hover:bg-forest-500 transition-colors text-white text-sm font-medium px-4 py-3"
             >
-              {t.continuar}
+              {PAGAMENTO_ATIVO ? t.continuar : t.solicitar}
               <Svg size={16} strokeWidth={1.8}><path d="M5 12h14M13 6l6 6-6 6" /></Svg>
             </button>
-            {/* Enquanto o Stripe não estiver ligado, o visitante é levado ao formulário de contato */}
-            {tentouPagar ? (
-              <p className="text-[12px] text-forest-900 bg-cream-100 border border-forest-900/10 rounded-md px-3 py-2" role="status">
-                {t.emBreve}{' '}
-                <Link to="/contato" className="underline underline-offset-2">
-                  {t.faleConosco}
-                </Link>
-                .
-              </p>
-            ) : (
-              <p className="text-[11.5px] text-stone-700/70">{t.reserva}</p>
-            )}
+            <p className="text-[11.5px] text-stone-700/70">{PAGAMENTO_ATIVO ? t.reserva : t.solicitarNota}</p>
           </div>
         )}
       </div>
